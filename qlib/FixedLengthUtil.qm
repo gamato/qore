@@ -333,7 +333,7 @@ my hash $h = $i.getValue();
                 if (value.typeCode() == NT_STRING) {
                     if (*string nf = type.format ? type.format : m_opts.number_format)
                         return parse_float(value, nf); # TODO: make it strict once there's such support in Qore (see #305 on GitHub)
-                    if (!is_int(value) and !is_float(value))
+                    if (!is_float(value))
                         throw "FIELD-VALUE-ERROR", sprintf("invalid %s value: %y", type.type, value);
                 }
                 return float(value);
@@ -342,7 +342,7 @@ my hash $h = $i.getValue();
                 if (value.typeCode() == NT_STRING) {
                     if (*string nf = type.format ? type.format : m_opts.number_format)
                         return parse_number(value, nf); # TODO: make it strict once there's such support in Qore (see #305 on GitHub)
-                    if (!is_int(value) and !is_float(value) and !is_number(value))
+                    if (!is_number(value))
                         throw "FIELD-VALUE-ERROR", sprintf("invalid %s value: %y", type.type, value);
                 }
                 return number(value);
