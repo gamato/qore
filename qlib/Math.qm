@@ -81,6 +81,25 @@ public namespace Math {
         return nlog(n) / nlog(base);
     }
 
+    #! Sums start and the items of a list and returns the total. start defaults to 0.
+    /**
+        This generic version selects datatype based on either start argument (if used)
+        or based on first item of the list.  Use specific versions to force datatype,
+        especially when high precision summation of float values is required.
+
+        @see @ref Math::isum(), @ref Math::fsum(), @ref Math::nsum()
+    */
+    public any sub sum (list la, *any start) {
+        map start += $1, la;
+        return start;
+    }
+
+    #! Sums start and the items of a list and returns the total. start defaults to 0.
+    public int sub isum (list li, int start = 0) {
+        map start += $1, li;
+        return start;
+    }
+
     #! Full precision summation using multiple floats for intermediate values.
     public float sub fsum (list lf, float start = 0.0) {
         # Rounded x+y stored in hi with the round-off stored in lo.  Together
@@ -109,6 +128,12 @@ public namespace Math {
         float r;
         map r += $1, partials;
         return r;
+    }
+
+    #! Sums start and the items of a list and returns the total. start defaults to 0.
+    public number sub nsum (list ln, number start = 0n) {
+        map start += $1, ln;
+        return start;
     }
 }
 
