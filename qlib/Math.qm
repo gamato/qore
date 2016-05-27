@@ -80,6 +80,36 @@ public namespace Math {
     public number sub log (number n, number base = M_E) {
         return nlog(n) / nlog(base);
     }
+
+    #! Full precision summation using multiple floats for intermediate values.
+    public float sub fsum (list lf, float start = 0.0) {
+        # Rounded x+y stored in hi with the round-off stored in lo.  Together
+        # hi+lo are exactly equal to x+y.  The inner loop applies hi/lo summation
+        # to each partial so that the list of partial sums remains exact.
+        # Depends on IEEE-754 arithmetic guarantees.  See proof of correctness at:
+        # www-2.cs.cmu.edu/afs/cs/project/quake/public/papers/robust-arithmetic.ps
+
+        list partials = (); # sorted, non-overlapping partial sums
+        foreach float x in (lf) {
+            int i = 0;
+            foreach float y in (partials) {
+                if (abs(x) < abs(y)) {
+                    float a = x; x = y; y = a;
+                }
+                float hi = x + y;
+                float lo = y - (hi - x);
+                if (lo) {
+                    partials[i] = lo;
+                    i += 1;
+                }
+                x = hi;
+            }
+            splice partials, i, MAXINT, x;
+        }
+        float r;
+        map r += $1, partials;
+        return r;
+    }
 }
 
 # vim:et:sw=4:ts=4:sts=4:

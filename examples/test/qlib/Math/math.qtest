@@ -25,6 +25,7 @@ public class MathTest inherits QUnit::Test {
         addTestCase ("Test listmul helper function", \test_listmul());
         addTestCase ("Test gamma function", \test_gamma());
         addTestCase ("Test log function", \test_log());
+        addTestCase ("Test sum functions", \test_sum());
         set_return_value(main());
     }
 
@@ -58,5 +59,9 @@ public class MathTest inherits QUnit::Test {
         # assertTrue (log(@NInf@).ninfp()); # no negative infinity support in Qore yet
         # assertTrue (log(@Inf@).infp()); # TODO: float does not have nanp() yet
         # assertTrue (log(@NaN@).nanp()); # TODO: float does not have nanp() yet
+    }
+
+    test_sum() {
+        assertEq (20000.0, fsum (listmul ((1, 1e100, 1, -1e100), 10000)), "fsum");
     }
 }
