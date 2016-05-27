@@ -9,12 +9,30 @@
 
 %exec-class MathTest
 
+#! Returns a new list as 'num' times concatenated 'arg' list.
+list sub listmul (softlist arg, softint num) {
+    list r = ();
+    while (num > 0) {
+        r += arg;
+        --num;
+    }
+    return r;
+}
+
 
 public class MathTest inherits QUnit::Test {
     constructor() : Test ("MathTest", "1.0") {
+        addTestCase ("Test listmul helper function", \test_listmul());
         addTestCase ("Test gamma function", \test_gamma());
         addTestCase ("Test log function", \test_log());
         set_return_value(main());
+    }
+
+    test_listmul() {
+        assertEq (list(), listmul ((), 2), "listmul: empty list");
+        assertEq (list(), listmul ((1,2), 0), "listmul: num=0");
+        assertEq ((1,2), listmul ((1,2), 1), "listmul: num=1");
+        assertEq ((1,2,1,2,1,2), listmul ((1,2), 3), "listmul: num>1");
     }
 
     test_gamma() {
