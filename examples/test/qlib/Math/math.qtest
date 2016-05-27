@@ -1,0 +1,27 @@
+#!/usr/bin/env qore
+
+%requires ../../../../qlib/Math.qm
+%requires ../../../../qlib/QUnit.qm
+
+%new-style
+%require-types
+%enable-all-warnings
+
+%exec-class MathTest
+
+
+public class MathTest inherits QUnit::Test {
+    constructor() : Test ("MathTest", "1.0") {
+        addTestCase ("Test gamma function", \test_gamma());
+        set_return_value(main());
+    }
+
+    test_gamma() {
+        list r = (
+                2.67893853, 1.35411794, 1.00000000, 0.89297951, 0.90274529,
+                1.00000000, 1.19063935, 1.50457549, 2.00000000, 2.77815848,
+                );
+        for (float x=1.0; x <= 10.0; x+=1.0)
+            assertFloatEq (r[x-1], gamma (x/3.0), 0.00000001, sprintf ("gamma #%d", x));
+    }
+}
