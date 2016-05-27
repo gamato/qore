@@ -54,11 +54,11 @@ public class MathTest inherits QUnit::Test {
         assertFloatEq (40, log (pow(10.0, 40), 10), eps, 'log(10^40, 10)');
         assertFloatEq (2, log (pow(10.0, 40), pow(10.0, 20)), eps, 'log(10^40, 10^20)');
         assertNumberEq (2302.5850929940457, log (pow(10n, 1000)), eps, 'log(10^1000)');
-        # assertTrue (log(-1.5).nanp()); # TODO: float does not have nanp() yet
-        # assertTrue (log(-pow(10.0, 1000)).nanp()); # TODO: float does not have nanp() yet
-        # assertTrue (log(@NInf@).ninfp()); # no negative infinity support in Qore yet
-        # assertTrue (log(@Inf@).infp()); # TODO: float does not have nanp() yet
-        # assertTrue (log(@NaN@).nanp()); # TODO: float does not have nanp() yet
+        assertTrue (log(-1.5).nanp(), 'log(-1.5)');
+        assertTrue (log(-pow(10.0, 1000)).nanp(), 'log(-(10^1000))');
+        assertTrue (log(-@Inf@).nanp(), 'log(-@INF@)');
+        assertTrue (log(@Inf@).infp(), 'log(+@INF@)');
+        assertTrue (log(@NaN@).nanp(), 'log(@NAN@)');
     }
 
     test_sum() {
