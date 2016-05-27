@@ -44,6 +44,12 @@ namespace Init {
 }
 
 public namespace Math {
+    # Some useful constants
+    public const M_E = 2.718281828459045235360287471352662497757247093699959574966;
+    public const M_PI = 3.141592653589793238462643383279502884197169399375105820974;
+    public const M_SQRTPI = 1.772453850905516027298167483341145182797549456122387128213;
+    public const M_LOGPI = 1.144729885849400174143427351353058711647294812915311571513;
+
     #! Return the Gamma function at x. Lanczos approximation.
     public float sub gamma (softfloat x) {
         list p = (
@@ -63,6 +69,16 @@ public namespace Math {
             a += p[i] / (x+i);
 
         return sqrt(2*M_PI) * pow(t, x+0.5) * exp(-t) * a;
+    }
+
+    #! Return the logarithm of x to the given base, calculated as nlog(x)/nlog(base).
+    public float sub log (softfloat f, softfloat base = M_E) {
+        return nlog(f) / nlog(base);
+    }
+
+    #! Return the logarithm of x to the given base, calculated as nlog(x)/nlog(base).
+    public number sub log (number n, number base = M_E) {
+        return nlog(n) / nlog(base);
     }
 }
 
