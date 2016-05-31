@@ -50,20 +50,20 @@ public namespace Math {
     public const M_SQRTPI = 1.772453850905516027298167483341145182797549456122387128213;
     public const M_LOGPI = 1.144729885849400174143427351353058711647294812915311571513;
 
-    int sub _factorial (int x) {
-        if (x == 0)
-            return 1;
-        return x * _factorial (x-1);
-    }
-
-    #! Return x factorial.  NOTE: super naive stack exhausting implementation :)
+    #! Return x factorial.
     /**
         @throw "VALUE-ERROR" if x is not integral or is negative
     */
-    int sub factorial (softint x) {
+    public number sub factorial (softnumber x) {
         if (x < 0)
             throw "VALUE-ERROR", "factorial() only accepts integral values";
-        return _factorial(x);
+        if (x != floor(x))
+            throw "VALUE-ERROR", "factorial() not defined for negative values";
+        number r = 1;
+        if (x >= 2)
+            for (number i=2; i<=x; ++i)
+                r *= i;
+        return r;
     }
 
     #! Return the Gamma function at x. Lanczos approximation.

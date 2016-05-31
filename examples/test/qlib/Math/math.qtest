@@ -23,6 +23,7 @@ list sub listmul (softlist arg, softint num) {
 public class MathTest inherits QUnit::Test {
     constructor() : Test ("MathTest", "1.0") {
         addTestCase ("Test listmul helper function", \test_listmul());
+        addTestCase ("Test factorial function", \test_factorial());
         addTestCase ("Test gamma function", \test_gamma());
         addTestCase ("Test log function", \test_log());
         addTestCase ("Test sum functions", \test_sum());
@@ -34,6 +35,21 @@ public class MathTest inherits QUnit::Test {
         assertEq (list(), listmul ((1,2), 0), "listmul: num=0");
         assertEq ((1,2), listmul ((1,2), 1), "listmul: num=1");
         assertEq ((1,2,1,2,1,2), listmul ((1,2), 3), "listmul: num>1");
+    }
+
+    test_factorial() {
+        assertEq (1n, factorial(0), "factorial(0)");
+        number total = 1;
+        for (int i=1; i<=100; ++i) {
+            total *= i;
+            assertEq (total, factorial(i), sprintf ("factorial(%d)", i));
+        }
+        code kod = sub () { call_function_args ('factorial', argv); };
+        assertThrows ("VALUE-ERROR", kod, -1, "factorial(-1)");
+        assertThrows ("VALUE-ERROR", kod, -1.0, "factorial(-1.0)");
+        assertThrows ("VALUE-ERROR", kod, -pow(10, 100), "factorial(-10^100)");
+        assertThrows ("VALUE-ERROR", kod, -1e100, "factorial(-1e100)");
+        assertThrows ("VALUE-ERROR", kod, M_PI, "factorial(pi)");
     }
 
     test_gamma() {
