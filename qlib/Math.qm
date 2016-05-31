@@ -107,7 +107,7 @@ public namespace Math {
     */
     public any sub sum (list la, *any start) {
         map start += $1, la;
-        return start;
+        return start ?? 0;
     }
 
     #! Sums start and the items of a list and returns the total. start defaults to 0.
@@ -143,7 +143,7 @@ public namespace Math {
         }
         float r;
         map r += $1, partials;
-        return r;
+        return r + start;
     }
 
     #! Sums start and the items of a list and returns the total. start defaults to 0.
