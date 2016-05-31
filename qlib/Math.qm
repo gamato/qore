@@ -97,6 +97,21 @@ public namespace Math {
         return nlog(n) / nlog(base);
     }
 
+    #! Return arithmetic mean ("average") of numeric data.
+    /**
+        The arithmetic mean is the sum of the data divided by the number of data points.
+        It is commonly called “the average”, although it is only one of many different mathematical averages.
+        It is a measure of the central location of the data.
+
+        @throw "VALUE-ERROR" if the list is empty
+    */
+    public any sub mean (list la) {
+        int n = la.size();
+        if (n < 1)
+            throw "VALUE-ERROR", "mean() requires at least one data point";
+        return psum(la) / float(n);
+    }
+
     #! Sums start and the items of a list and returns the total. start defaults to 0.
     /**
         This generic version selects datatype based on either start argument (if used)

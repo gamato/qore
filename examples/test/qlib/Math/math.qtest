@@ -26,6 +26,7 @@ public class MathTest inherits QUnit::Test {
         addTestCase ("Test factorial function", \test_factorial());
         addTestCase ("Test gamma function", \test_gamma());
         addTestCase ("Test log function", \test_log());
+        addTestCase ("Test mean function", \test_mean());
         addTestCase ("Test sum functions", \test_sum());
         set_return_value(main());
     }
@@ -75,6 +76,34 @@ public class MathTest inherits QUnit::Test {
         assertTrue (log(-@Inf@).nanp(), 'log(-@INF@)');
         assertTrue (log(@Inf@).infp(), 'log(+@INF@)');
         assertTrue (log(@NaN@).nanp(), 'log(@NAN@)');
+    }
+
+    test_mean() {
+        list x;
+        # Test mean with ints
+        x = (0, 1, 2, 3, 3, 3, 4, 5, 5, 6, 7, 7, 7, 7, 8, 9);
+        assertEq (4.8125, mean(x), "mean: integers");
+        # Test mean with floats
+        x = (17.25, 19.75, 20.0, 21.5, 21.75, 23.25, 25.125, 27.5);
+        assertEq (22.015625, mean(x), "mean: floats");
+        # Test mean with numbers
+        x = (1.634n, 2.517n, 3.912n, 4.072n, 5.813n);
+        assertNumberEq (3.5896n, mean(x), 1e-10, "mean: numbers");
+        # Test mean with empty list
+        code kod = sub () { call_function_args ('mean', argv); };
+        assertThrows ("VALUE-ERROR", kod, ((),), "mean: empty list");
+        # Mean of (a,b,c...z) should be same as for (a,a,b,b,c,c...z,z)
+        x = range(1000);
+        assertEq (mean(x), mean (listmul (x,2)), "mean: doubled list");
+        # Test adding a large constant to every data point
+        float c = 1e9;
+        x = (3.4, 4.5, 4.9, 6.7, 6.8, 7.2, 8.0, 8.1, 9.4);
+        float exp = mean(x) + c;
+        assertTrue (exp != c);
+        assertEq (exp, mean (map $1+c, x), "mean: list + large constant");
+        # Try to exploit lack of precision of 64-bit float
+        x = (1e100, 1, 3, -1e100);
+        assertEq (1.0, mean(x), "mean: full precision");
     }
 
     test_sum() {
