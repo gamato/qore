@@ -101,9 +101,9 @@ public namespace Math {
     /**
         This generic version selects datatype based on either start argument (if used)
         or based on first item of the list.  Use specific versions to force datatype,
-        especially when high precision summation of float values is required.
+        especially when high precision summation of float / number values is required.
 
-        @see @ref Math::isum(), @ref Math::fsum(), @ref Math::nsum()
+        @see @ref Math::isum(), @ref Math::fsum(), @ref Math::nsum(), @ref Math::psum()
     */
     public any sub sum (list la, *any start) {
         map start += $1, la;
@@ -116,7 +116,10 @@ public namespace Math {
         return start;
     }
 
-    #! Full precision summation using multiple floats for intermediate values.
+    #! Sums start and the items of a list and returns the total. start defaults to 0.
+    /**
+        Full precision summation using multiple floats for intermediate values.
+    */
     public float sub fsum (list lf, float start = 0.0) {
         # Rounded x+y stored in hi with the round-off stored in lo.  Together
         # hi+lo are exactly equal to x+y.  The inner loop applies hi/lo summation
@@ -150,6 +153,31 @@ public namespace Math {
     public number sub nsum (list ln, number start = 0n) {
         map start += $1, ln;
         return start;
+    }
+
+    #! Sums start and the items of a list and returns the total. start defaults to 0.
+    /**
+        Full precision summation version of the generic sum() function.
+
+        This generic version selects datatype based on either start argument (if used)
+        or based on the first item of the list.
+
+        @see @ref Math::sum(), @ref Math::isum(), @ref Math::fsum(), @ref Math::nsum()
+    */
+    public any sub psum (list la, *any start) {
+        any x = start ?? la[0];
+        switch (x.typeCode()) {
+            case NT_NUMBER:
+                return nsum (la, start ?? 0);
+            case NT_FLOAT:
+                return fsum (la, start ?? 0);
+            case NT_INT:
+                return isum (la, start ?? 0);
+            default:
+                if (start == NOTHING && la.size() == 0)
+                    return 0;
+                throw "VALUE-ERROR", "sum() only accepts numeric values";
+        }
     }
 }
 

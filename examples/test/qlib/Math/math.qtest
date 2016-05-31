@@ -83,6 +83,10 @@ public class MathTest inherits QUnit::Test {
         assertEq (50005000, sum (range (10000)), "sum: integers");
         assertEq (0.0, sum (listmul ((1.0, 1e100, 1.0, -1e100), 10000)), "sum: floats"); # NOTE: exploits lack of precision of 64-bit float
         assertEq (20000n, sum (listmul ((1n, 1e100n, 1n, -1e100n), 10000)), "sum: numbers");
+        # generic high precision function
+        assertEq (50005000, psum (range (10000)), "psum: integers");
+        assertEq (20000.0, psum (listmul ((1.0, 1e100, 1.0, -1e100), 10000)), "psum: floats");
+        assertEq (20000n, psum (listmul ((1n, 1e100n, 1n, -1e100n), 10000)), "psum: numbers");
         # specialised functions
         assertEq (50005000, isum (range (10000)), "isum");
         assertEq (20000.0, fsum (listmul ((1, 1e100, 1, -1e100), 10000)), "fsum");
@@ -93,11 +97,13 @@ public class MathTest inherits QUnit::Test {
         assertEq (56, isum (x, 1), "isum: start != 0");
         assertEq (56.0, fsum (x, 1), "fsum: start != 0");
         assertEq (56n, nsum (x, 1), "nsum: start != 0");
+        assertEq (56, psum (x, 1), "psum: start != 0");
         # empty list
         x = ();
         assertEq (0, sum (x), "sum: empty list");
         assertEq (0, isum (x), "isum: empty list");
         assertEq (0.0, fsum (x), "fsum: empty list");
         assertEq (0n, nsum (x), "nsum: empty list");
+        assertEq (0, psum (x), "psum: empty list");
     }
 }
