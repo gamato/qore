@@ -117,6 +117,13 @@ public class MathTest inherits QUnit::Test {
         x = (1, 2, 3, 4, 5, 6, 7);
         assertEq (1, x.size() % 2);
         assertEq (4, median(x), "median: odd count");
+
+        x = (1, 2, 3, 4, 5, 6);
+        assertEq (0, x.size() % 2);
+        # Test median_low with an even number of ints
+        assertEq (3, median_low(x), "median_low");
+        # Test median_high with an even number of ints
+        assertEq (4, median_high(x), "median_high");
     }
 
     test_sum() {

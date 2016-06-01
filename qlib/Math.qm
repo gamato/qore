@@ -133,6 +133,42 @@ public namespace Math {
         return (s[i-1] + s[i]) / 2.0;
     }
 
+    #! Return the low median of numeric data.
+    /**
+        When the number of data points is odd, the middle value is returned.
+        When it is even, the smaller of the two middle values is returned.
+
+        @throw "VALUE-ERROR" if the list is empty
+
+        @see @ref Math::median_high(), @ref Math::median()
+    */
+    public any sub median_low (list la) {
+        int n = la.size();
+        if (n < 1)
+            throw "VALUE-ERROR", "median() requires at least one data point";
+        list s = sort(la);
+        if (n % 2 == 1)
+            return s[n/2];
+        return s[n/2 - 1];
+    }
+
+    #! Return the high median of numeric data.
+    /**
+        When the number of data points is odd, the middle value is returned.
+        When it is even, the larger of the two middle values is returned.
+
+        @throw "VALUE-ERROR" if the list is empty
+
+        @see @ref Math::median_low(), @ref Math::median()
+    */
+    public any sub median_high (list la) {
+        int n = la.size();
+        if (n < 1)
+            throw "VALUE-ERROR", "median() requires at least one data point";
+        list s = sort(la);
+        return s[n/2];
+    }
+
     #! Sums start and the items of a list and returns the total. start defaults to 0.
     /**
         This generic version selects datatype based on either start argument (if used)
