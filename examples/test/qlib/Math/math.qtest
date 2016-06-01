@@ -29,6 +29,7 @@ public class MathTest inherits QUnit::Test {
         addTestCase ("Test mean function", \test_mean());
         addTestCase ("Test median functions", \test_median());
         addTestCase ("Test sum functions", \test_sum());
+        addTestCase ("Test Multiset class", \test_multiset());
         set_return_value(main());
     }
 
@@ -37,6 +38,45 @@ public class MathTest inherits QUnit::Test {
         assertEq (list(), listmul ((1,2), 0), "listmul: num=0");
         assertEq ((1,2), listmul ((1,2), 1), "listmul: num=1");
         assertEq ((1,2,1,2,1,2), listmul ((1,2), 3), "listmul: num>1");
+    }
+
+    test_multiset() {
+        list x = ('a', 'b', 'c', 'a', 'b', 'a');
+        hash exp = {'a': 3, 'b': 2, 'c': 1};
+        Multiset c (x);
+        assertEq (exp, new Multiset(x).items(), "Multiset: list");
+        assertEq (exp, new Multiset(exp).items(), "Multiset: hash");
+        assertEq (exp, new Multiset(x.iterator()).items(), "Multiset: list iterator");
+        assertEq (exp, new Multiset(exp.pairIterator()).items(), "Multiset: hash iterator");
+        assertEq (exp, c.items(), "Multiset: items");
+        assertEq (sort(x), sort(c.elems()), "Multiset: elems");
+        # most_common
+        assertEq (exp, c.most_common(), "Multiset: most_common()");
+        assertEq ({}, c.most_common(0), "Multiset: most_common(0)");
+        foreach int i in (range(1, c.items().size() + 1)) {
+            list kp = list km = c.items().keys();
+            splice kp, i;
+            km = extract km, -i;
+            assertEq (exp.(kp), c.most_common(i), sprintf ("Multiset: most_common(%d)", i));
+            assertEq (exp.(km), c.most_common(-i), sprintf ("Multiset: most_common(%d)", -i));
+        }
+        # update
+        c.update (('d',));
+        c.update ({'a': 30, 'b': 20});
+        c.update (listmul('a', 300) + listmul('b', 200));
+        assertEq ({'a': 333, 'b': 222, 'c': 1, 'd': 1}, c.items(), "Multiset: update");
+        # subtract
+        c.subtract (('d',));
+        c.subtract ({'a': 30, 'b': 20});
+        c.subtract (listmul('a', 300) + listmul('b', 200));
+        assertEq (sort(x), sort(c.elems()), "Multiset: subtract");
+        c.subtract (x);
+        assertEq (list(), c.elems(), "Multiset: subtract to zero - elems");
+        assertEq ({'a': 0, 'b': 0, 'c': 0, 'd': 0}, c.items(), "Multiset: subtract to zero - items");
+        # clear
+        c.clear();
+        assertEq ((), c.elems(), "Multiset: clear - elems");
+        assertEq ({}, c.items(), "Multiset: clear - items");
     }
 
     test_factorial() {

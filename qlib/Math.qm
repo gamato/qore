@@ -253,4 +253,97 @@ public namespace Math {
     }
 }
 
+# ============================== helper code ==============================
+
+#! Return a new list as 'num' times concatenated 'arg' list.
+list sub Math::listmul (softlist arg, softint num) {
+    list r = ();
+    while (num > 0) {
+        r += arg;
+        --num;
+    }
+    return r;
+}
+
+/**
+    Class for counting hashable items.  Sometimes called a counter or bag or multiset.
+    Elements are stored as hash keys and their counts are stored as hash values.
+
+    @see http://en.wikipedia.org/wiki/Multiset
+*/
+public class Math::Multiset {
+    private {
+        hash _h = {};
+    }
+
+    constructor (any x) {
+        self.update(x);
+    }
+
+    update (Qore::ListIterator x) {
+        map _h.($1.toString()) += 1, x;
+    }
+
+    update (list x) {
+        self.update (x.iterator());
+    }
+
+    update (Qore::HashPairIterator x) {
+        map _h.($1.key) += $1.value, x;
+    }
+
+    update (hash x) {
+        self.update (x.pairIterator());
+    }
+
+    subtract (Qore::ListIterator x) {
+        map _h.($1.toString()) -= 1, x;
+    }
+
+    subtract (list x) {
+        self.subtract (x.iterator());
+    }
+
+    subtract (Qore::HashPairIterator x) {
+        map _h.($1.key) -= $1.value, x;
+    }
+
+    subtract (hash x) {
+        self.subtract (x.pairIterator());
+    }
+
+    clear () {
+        _h = {};
+    }
+
+    #! Return all elements repeating each as many times as its count.
+    list elems () {
+        list r = ();
+        map r += listmul ($1.key, $1.value), _h.pairIterator();
+        return r;
+    }
+
+    #! Return hash of all element:count pairs.
+    hash items () {
+        return _h;
+    }
+
+    #! Return the n most common elements and their counts from the most common to the least.
+    /**
+        Return the n most common elements and their counts from the most common to the least.
+        If n is omitted or NOTHING, then return all element counts.
+    */
+    hash most_common (*int n) {
+        list x = map ($1.key, $1.value), _h.pairIterator();
+        code f = int sub (list l, list r) { return l[1] <=> r[1]; };
+        list s = sort_descending_stable (x, f);
+        if (exists n)
+            if (n >= 0)
+                splice s, n;
+            else if (-n < s.size())
+                splice s, 0, s.size() + n;
+        return map {$1[0]: $1[1]}, s;
+    }
+}
+
 # vim:et:sw=4:ts=4:sts=4:
