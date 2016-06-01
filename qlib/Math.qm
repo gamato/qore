@@ -210,7 +210,7 @@ public namespace Math {
             case NT_INT:
                 return isum (la, start ?? 0);
             default:
-                if (start == NOTHING && la.size() == 0)
+                if (start === NOTHING && la.size() == 0)
                     return 0;
                 throw "VALUE-ERROR", "sum() only accepts numeric values";
         }
