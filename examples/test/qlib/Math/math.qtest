@@ -38,13 +38,14 @@ public class MathTest inherits QUnit::Test {
     constructor() : Test ("MathTest", "1.0") {
         addTestCase ("Test hash/list/string helper functions", \test_hash_list_string());
         addTestCase ("Test listmul helper function", \test_listmul());
+        addTestCase ("Test Multiset class", \test_multiset());
         addTestCase ("Test factorial function", \test_factorial());
         addTestCase ("Test gamma function", \test_gamma());
         addTestCase ("Test log function", \test_log());
         addTestCase ("Test mean function", \test_mean());
         addTestCase ("Test median functions", \test_median());
+        addTestCase ("Test mode function", \test_mode());
         addTestCase ("Test sum functions", \test_sum());
-        addTestCase ("Test Multiset class", \test_multiset());
         set_return_value(main());
     }
 
@@ -193,6 +194,23 @@ public class MathTest inherits QUnit::Test {
         assertEq (3, median_low(x), "median_low");
         # Test median_high with an even number of ints
         assertEq (4, median_high(x), "median_high");
+    }
+
+    test_mode() {
+        list x;
+        x = str2list ("abcbdb");
+        assertEq (("b",), mode(x), "mode: letters");
+        x = "fe fi fo fum fi fi".split(" ");
+        assertEq (("fi",), mode(x), "mode: words");
+        x = range(10);
+        foreach int i in (range(10))
+            assertEq ((i,), mode (x + i), "mode: discrete data");
+        x = (1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 6, 6, 6, 7, 8, 9, 9);
+        assertEq ((2,6), mode(x), "mode: bimodal data");
+        x = range(666);
+        assertEq (x.size(), mode(x).size(), "mode: unique data");
+        code kod = sub () { call_function_args ('mode', argv); };
+        assertThrows ("VALUE-ERROR", kod, ((),), "mode: no data");
     }
 
     test_sum() {

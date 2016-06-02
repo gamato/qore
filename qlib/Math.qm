@@ -169,6 +169,21 @@ public namespace Math {
         return s[n/2];
     }
 
+    #! Return the most common data point(s) from discrete or nominal data.
+    /**
+        @throw "VALUE-ERROR" if the list is empty
+    */
+    public list sub mode (list la) {
+        int n = la.size();
+        if (n < 1)
+            throw "VALUE-ERROR", "mode() requires at least one data point";
+        Multiset ms (la);
+        list h = ms.most_common();
+        int m = h[0][1];
+        list r = map $1[0], h, $1[1] == m;
+        return r;
+    }
+
     #! Sums start and the items of a list and returns the total. start defaults to 0.
     /**
         This generic version selects datatype based on either start argument (if used)
@@ -333,7 +348,7 @@ public class Math::Multiset {
         Return the n most common elements and their counts from the most common to the least.
         If n is omitted or NOTHING, then return all element counts.
     */
-    hash most_common (*int n) {
+    list most_common (*int n) {
         list x = map ($1.key, $1.value), _h.pairIterator();
         code f = int sub (list l, list r) { return l[1] <=> r[1]; };
         list s = sort_descending_stable (x, f);
@@ -342,7 +357,7 @@ public class Math::Multiset {
                 splice s, n;
             else if (-n < s.size())
                 splice s, 0, s.size() + n;
-        return map {$1[0]: $1[1]}, s;
+        return s;
     }
 }
 
