@@ -81,14 +81,14 @@ public class MathTest inherits QUnit::Test {
         assertEq (exp, c.items(), "Multiset: items");
         assertEq (sort(x), sort(c.elems()), "Multiset: elems");
         # most_common
-        assertEq (exp, c.most_common(), "Multiset: most_common()");
-        assertEq ({}, c.most_common(0), "Multiset: most_common(0)");
+        assertEq (hash2list(exp), c.most_common(), "Multiset: most_common()");
+        assertEq (hash2list({}), c.most_common(0), "Multiset: most_common(0)");
         foreach int i in (range(1, c.items().size() + 1)) {
             list kp = list km = c.items().keys();
             splice kp, i;
             km = extract km, -i;
-            assertEq (exp.(kp), c.most_common(i), sprintf ("Multiset: most_common(%d)", i));
-            assertEq (exp.(km), c.most_common(-i), sprintf ("Multiset: most_common(%d)", -i));
+            assertEq (hash2list(exp.(kp)), c.most_common(i), sprintf ("Multiset: most_common(%d)", i));
+            assertEq (hash2list(exp.(km)), c.most_common(-i), sprintf ("Multiset: most_common(%d)", -i));
         }
         # update
         c.update (('d',));
