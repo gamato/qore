@@ -282,51 +282,204 @@ list sub Math::listmul (softlist arg, softint num) {
 
 /**
     Class for counting hashable items.  Sometimes called a counter or bag or multiset.
-    Elements are stored as hash keys and their counts are stored as hash values.
 
     @see http://en.wikipedia.org/wiki/Multiset
 */
-public class Math::Multiset {
+public class Math::AbstractMultiset {
     private {
-        hash _h = {};
     }
 
     constructor (any x) {
         self.update(x);
     }
 
-    update (Qore::ListIterator x) {
-        map _h.($1.toString()) += 1, x;
-    }
+    abstract update (Qore::ListIterator x);
+    abstract update (Qore::HashPairIterator x);
+
+    abstract subtract (Qore::ListIterator x);
+    abstract subtract (Qore::HashPairIterator x);
 
     update (list x) {
         self.update (x.iterator());
-    }
-
-    update (Qore::HashPairIterator x) {
-        map _h.($1.key) += $1.value, x;
     }
 
     update (hash x) {
         self.update (x.pairIterator());
     }
 
-    subtract (Qore::ListIterator x) {
-        map _h.($1.toString()) -= 1, x;
+    update (AbstractMultiset x) {
+        self.update (x.elems().iterator());
     }
 
     subtract (list x) {
         self.subtract (x.iterator());
     }
 
-    subtract (Qore::HashPairIterator x) {
-        map _h.($1.key) -= $1.value, x;
-    }
-
     subtract (hash x) {
         self.subtract (x.pairIterator());
     }
 
+    subtract (AbstractMultiset x) {
+        self.subtract (x.elems().iterator());
+    }
+
+    abstract clear ();
+    abstract int count (any x);
+    abstract list elems ();
+    abstract hash items ();
+    abstract list most_common (*int n);
+}
+
+/**
+    Class for counting hashable items.  Sometimes called a counter or bag or multiset.
+    Elements are indexed as hash keys and their {type, value, count} are stored as hash values.
+
+    @note This class is slower than @ref Math::UnsafeMultiset but it is safe to be used with values other than strings.
+
+    @see http://en.wikipedia.org/wiki/Multiset
+*/
+public class Math::Multiset inherits Math::AbstractMultiset {
+    private {
+        hash _h = {}; # consists of hashes with keys 'count', 'value', 'type'
+    }
+
+    constructor (any x) : AbstractMultiset (x) {
+    }
+
+    update (Qore::ListIterator x) {
+        foreach any item in (x) {
+            string k = item.toString();
+            if (!exists _h.(k)) {
+                _h.(k) = { 'count': 1, 'value': item, 'type': item.typeCode() };
+                continue;
+            }
+            reference r = \_h.(k);
+            if (r.type != item.typeCode() || r.value != item)
+                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                                                 item.type(), item, TypeCodeMap.(r.type), r.value);
+            r.count += 1;
+        }
+    }
+
+    update (Qore::HashPairIterator x) {
+        foreach hash h in (x) {
+            string k = h.key;
+            if (!exists _h.(k)) {
+                _h.(k) = { 'count': h.value, 'value': k, 'type': k.typeCode() };
+                continue;
+            }
+            reference r = \_h.(k);
+            if (r.type != k.typeCode() || r.value != k)
+                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                                                 k.type(), k, TypeCodeMap.(r.type), r.value);
+            r.count += h.value;
+        }
+    }
+
+    subtract (Qore::ListIterator x) {
+        foreach any item in (x) {
+            string k = item.toString();
+            if (!exists _h.(k)) {
+                _h.(k) = { 'count': -1, 'value': item, 'type': item.typeCode() };
+                continue;
+            }
+            reference r = \_h.(k);
+            if (r.type != item.typeCode() || r.value != item)
+                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                                                 item.type(), item, TypeCodeMap.(r.type), r.value);
+            r.count += -1;
+        }
+    }
+
+    subtract (Qore::HashPairIterator x) {
+        foreach hash h in (x) {
+            string k = h.key;
+            if (!exists _h.(k)) {
+                _h.(k) = { 'count': -h.value, 'value': k, 'type': k.typeCode() };
+                continue;
+            }
+            reference r = \_h.(k);
+            if (r.type != k.typeCode() || r.value != k)
+                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                                                 k.type(), k, TypeCodeMap.(r.type), r.value);
+            r.count += -h.value;
+        }
+    }
+
+    #! Remove all elements from the multiset.
+    clear () {
+        _h = {};
+    }
+
+    #! Return number of occurrences of an element.
+    int count (any x) {
+        int c = _h.(x.toString()).count ?? 0;
+        return c > 0 ? c : 0;
+    }
+
+    #! Return all elements repeating each as many times as its count.
+    list elems () {
+        list r = ();
+        map r += listmul ($1.value, $1.count), _h.iterator();
+        return r;
+    }
+
+    #! Return internal hash structure. Note: not part of API; implementation specific (!)
+    hash items () {
+        return _h;
+    }
+
+    #! Return the n most common elements and their counts from the most common to the least.
+    /**
+        Return the n most common elements and their counts from the most common to the least.
+        If n is omitted or NOTHING, then return all element counts.
+    */
+    list most_common (*int n) {
+        list x = map ($1.value, $1.count), _h.iterator();
+        code f = int sub (list l, list r) { return l[1] <=> r[1]; };
+        list s = sort_descending_stable (x, f);
+        if (exists n)
+            if (n >= 0)
+                splice s, n;
+            else if (-n < s.size())
+                splice s, 0, s.size() + n;
+        return s;
+    }
+}
+
+/**
+    Class for counting hashable items.  Sometimes called a counter or bag or multiset.
+    Elements are stored as hash keys and their counts are stored as hash values.
+
+    @note This class is faster than @ref Math::Multiset but it is not safe to be used with values other than strings.
+
+    @see http://en.wikipedia.org/wiki/Multiset
+*/
+public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
+    private {
+        hash _h = {};
+    }
+
+    constructor (any x) : AbstractMultiset (x) {
+    }
+
+    update (Qore::ListIterator x) {
+        map _h.($1.toString()) += 1, x;
+    }
+
+    update (Qore::HashPairIterator x) {
+        map _h.($1.key) += $1.value, x;
+    }
+
+    subtract (Qore::ListIterator x) {
+        map _h.($1.toString()) -= 1, x;
+    }
+
+    subtract (Qore::HashPairIterator x) {
+        map _h.($1.key) -= $1.value, x;
+    }
+
+    #! Remove all elements from the multiset.
     clear () {
         _h = {};
     }
@@ -344,7 +497,7 @@ public class Math::Multiset {
         return r;
     }
 
-    #! Return hash of all element:count pairs.
+    #! Return internal hash structure. Note: not part of API; implementation specific (!)
     hash items () {
         return _h;
     }

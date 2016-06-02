@@ -38,7 +38,7 @@ public class MathTest inherits QUnit::Test {
     constructor() : Test ("MathTest", "1.0") {
         addTestCase ("Test hash/list/string helper functions", \test_hash_list_string());
         addTestCase ("Test listmul helper function", \test_listmul());
-        addTestCase ("Test Multiset class", \test_multiset());
+        addTestCase ("Test Multiset classes", \test_multiset());
         addTestCase ("Test factorial function", \test_factorial());
         addTestCase ("Test gamma function", \test_gamma());
         addTestCase ("Test log function", \test_log());
@@ -71,46 +71,53 @@ public class MathTest inherits QUnit::Test {
     }
 
     test_multiset() {
+        _test_multisets ("Multiset", any sub (any arg) { return new Multiset (arg); });
+        _test_multisets ("UnsafeMultiset", any sub (any arg) { return new UnsafeMultiset (arg); });
+    }
+
+    _test_multisets (string class_name, code class_creator) {
         list x = ('a', 'b', 'c', 'a', 'b', 'a');
         hash exp = {'a': 3, 'b': 2, 'c': 1};
-        Multiset c (x);
-        assertEq (exp, new Multiset(x).items(), "Multiset: list");
-        assertEq (exp, new Multiset(exp).items(), "Multiset: hash");
-        assertEq (exp, new Multiset(x.iterator()).items(), "Multiset: list iterator");
-        assertEq (exp, new Multiset(exp.pairIterator()).items(), "Multiset: hash iterator");
-        assertEq (exp, c.items(), "Multiset: items");
-        assertEq (sort(x), sort(c.elems()), "Multiset: elems");
+        any c = class_creator (x);
+        assertEq (sort(x), class_creator(x).elems(), class_name + ": create from list");
+        assertEq (sort(x), class_creator(x.iterator()).elems(), class_name + ": create from list iterator");
+        assertEq (sort(x), class_creator(exp).elems(), class_name + ": create from hash");
+        assertEq (sort(x), class_creator(exp.pairIterator()).elems(), class_name + ": create from hash iterator");
+        assertEq (sort(x), class_creator(class_creator(x)).elems(), class_name + ": create from " + class_name);
+        # assertEq (exp, c.items(), class_name + ": items");
+        # assertEq (sort(x), sort(c.elems()), class_name + ": elems");
         # most_common
-        assertEq (hash2list(exp), c.most_common(), "Multiset: most_common()");
-        assertEq (hash2list({}), c.most_common(0), "Multiset: most_common(0)");
+        assertEq (hash2list(exp), c.most_common(), class_name + ": most_common()");
+        assertEq (hash2list({}), c.most_common(0), class_name + ": most_common(0)");
         foreach int i in (range(1, c.items().size() + 1)) {
             list kp = list km = c.items().keys();
             splice kp, i;
             km = extract km, -i;
-            assertEq (hash2list(exp.(kp)), c.most_common(i), sprintf ("Multiset: most_common(%d)", i));
-            assertEq (hash2list(exp.(km)), c.most_common(-i), sprintf ("Multiset: most_common(%d)", -i));
+            assertEq (hash2list(exp.(kp)), c.most_common(i), sprintf ("%s: most_common(%d)", class_name, i));
+            assertEq (hash2list(exp.(km)), c.most_common(-i), sprintf ("%s: most_common(%d)", class_name, -i));
         }
         # update
         c.update (('d',));
         c.update ({'a': 30, 'b': 20});
         c.update (listmul('a', 300) + listmul('b', 200));
-        assertEq ({'a': 333, 'b': 222, 'c': 1, 'd': 1}, c.items(), "Multiset: update");
-        # count
-        assertEq (333, c.count('a'), "Multiset: count existing");
-        assertEq (0, c.count('x'), "Multiset: count missing");
-        assertEq (0, c.count(), "Multiset: count no value");
+        assertEq ((('a', 333), ('b', 222), ('c', 1), ('d', 1)), c.most_common(), class_name + ": update");
         # subtract
         c.subtract (('d',));
         c.subtract ({'a': 30, 'b': 20});
         c.subtract (listmul('a', 300) + listmul('b', 200));
-        assertEq (sort(x), sort(c.elems()), "Multiset: subtract");
+        assertEq (sort(x), sort(c.elems()), class_name + ": subtract");
         c.subtract (x);
-        assertEq (list(), c.elems(), "Multiset: subtract to zero - elems");
-        assertEq ({'a': 0, 'b': 0, 'c': 0, 'd': 0}, c.items(), "Multiset: subtract to zero - items");
+        assertEq (list(), c.elems(), class_name + ": subtract to zero - elems");
+        assertEq ((('a', 0), ('b', 0), ('c', 0), ('d', 0)), c.most_common(), class_name + ": subtract to zero - items");
+        # count
+        c = class_creator (x);
+        assertEq (3, c.count('a'), class_name + ": count existing");
+        assertEq (0, c.count('x'), class_name + ": count missing");
+        assertEq (0, c.count(), class_name + ": count no value");
         # clear
         c.clear();
-        assertEq ((), c.elems(), "Multiset: clear - elems");
-        assertEq ({}, c.items(), "Multiset: clear - items");
+        assertEq ((), c.elems(), class_name + ": clear - elems");
+        assertEq ({}, c.items(), class_name + ": clear - items");
     }
 
     test_factorial() {
@@ -208,7 +215,7 @@ public class MathTest inherits QUnit::Test {
         assertEq (("fi",), mode(x), "mode: words");
         x = range(10);
         foreach int i in (range(10))
-            assertEq ((i,), mode (x + i), "mode: discrete data");
+            assertEq ((i,), mode (x + i), "mode: discrete data #" + i);
         x = (1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 6, 6, 6, 7, 8, 9, 9);
         assertEq ((2,6), mode(x), "mode: bimodal data");
         x = range(666);
