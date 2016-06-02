@@ -9,6 +9,14 @@
 
 %exec-class MathTest
 
+list sub hash2list (*hash x) {
+    return map ($1.key, $1.value), x.pairIterator();
+}
+
+hash sub list2hash (*list x) {
+    return map {$1[0]: $1[1]}, x.iterator();
+}
+
 #! Returns a new list as 'num' times concatenated 'arg' list.
 list sub listmul (softlist arg, softint num) {
     list r = ();
@@ -22,6 +30,7 @@ list sub listmul (softlist arg, softint num) {
 
 public class MathTest inherits QUnit::Test {
     constructor() : Test ("MathTest", "1.0") {
+        addTestCase ("Test hash/list helper functions", \test_hash_list());
         addTestCase ("Test listmul helper function", \test_listmul());
         addTestCase ("Test factorial function", \test_factorial());
         addTestCase ("Test gamma function", \test_gamma());
@@ -31,6 +40,17 @@ public class MathTest inherits QUnit::Test {
         addTestCase ("Test sum functions", \test_sum());
         addTestCase ("Test Multiset class", \test_multiset());
         set_return_value(main());
+    }
+
+    test_hash_list() {
+        hash h = {'a':1, 'b':2};
+        list l = (('a',1), ('b',2));
+        assertEq (l, hash2list(h), "hash2list: non-empty input");
+        assertEq (h, list2hash(l), "list2hash: non-empty input");
+        assertEq ((), hash2list({}), "hash2list: empty input");
+        assertEq ({}, list2hash(()), "list2hash: empty input");
+        assertEq ((), hash2list(), "hash2list: no value input");
+        assertEq ({}, list2hash(), "list2hash: no value input");
     }
 
     test_listmul() {
