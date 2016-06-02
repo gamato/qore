@@ -331,6 +331,12 @@ public class Math::Multiset {
         _h = {};
     }
 
+    #! Return number of occurrences of an element.
+    int count (any x) {
+        int c = _h.(x.toString()) ?? 0;
+        return c > 0 ? c : 0;
+    }
+
     #! Return all elements repeating each as many times as its count.
     list elems () {
         list r = ();

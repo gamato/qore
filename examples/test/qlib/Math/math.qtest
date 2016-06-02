@@ -95,6 +95,10 @@ public class MathTest inherits QUnit::Test {
         c.update ({'a': 30, 'b': 20});
         c.update (listmul('a', 300) + listmul('b', 200));
         assertEq ({'a': 333, 'b': 222, 'c': 1, 'd': 1}, c.items(), "Multiset: update");
+        # count
+        assertEq (333, c.count('a'), "Multiset: count existing");
+        assertEq (0, c.count('x'), "Multiset: count missing");
+        assertEq (0, c.count(), "Multiset: count no value");
         # subtract
         c.subtract (('d',));
         c.subtract ({'a': 30, 'b': 20});
