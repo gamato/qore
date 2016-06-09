@@ -290,7 +290,8 @@ public class Math::AbstractMultiset {
     }
 
     constructor (any x) {
-        self.update(x);
+        if (exists x)
+            self.update(x);
     }
 
     abstract update (Qore::ListIterator x);
@@ -308,7 +309,7 @@ public class Math::AbstractMultiset {
     }
 
     update (AbstractMultiset x) {
-        self.update (x.elems().iterator());
+        self.update (x.items().iterator());
     }
 
     subtract (list x) {
@@ -320,13 +321,13 @@ public class Math::AbstractMultiset {
     }
 
     subtract (AbstractMultiset x) {
-        self.subtract (x.elems().iterator());
+        self.subtract (x.items().iterator());
     }
 
     abstract clear ();
     abstract int count (any x);
-    abstract list elems ();
-    abstract hash items ();
+    abstract list items ();
+    abstract list pairs ();
     abstract list most_common (*int n);
 }
 
@@ -418,14 +419,27 @@ public class Math::Multiset inherits Math::AbstractMultiset {
     }
 
     #! Return all elements repeating each as many times as its count.
-    list elems () {
+    /**
+        If an element’s count is less than one, items() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    list items () {
         list r = ();
-        map r += listmul ($1.value, $1.count), _h.iterator();
+        map r += listmul ($1.value, $1.count), _h.iterator(), $1.count > 0;
         return r;
     }
 
+    #! Return all elements as a list of (value, count) pairs.
+    /**
+        If an element’s count is less than one, pairs() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    list pairs () {
+        return map ($1.value, $1.count), _h.iterator(), $1.count > 0;
+    }
+
     #! Return internal hash structure. Note: not part of API; implementation specific (!)
-    hash items () {
+    any dump () {
         return _h;
     }
 
@@ -491,14 +505,27 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     }
 
     #! Return all elements repeating each as many times as its count.
-    list elems () {
+    /**
+        If an element’s count is less than one, items() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    list items () {
         list r = ();
-        map r += listmul ($1.key, $1.value), _h.pairIterator();
+        map r += listmul ($1.key, $1.value), _h.pairIterator(), $1.value > 0;
         return r;
     }
 
+    #! Return all elements as a list of (value, count) pairs.
+    /**
+        If an element’s count is less than one, pairs() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    list pairs () {
+        return map ($1.key, $1.value), _h.pairIterator(), $1.value > 0;
+    }
+
     #! Return internal hash structure. Note: not part of API; implementation specific (!)
-    hash items () {
+    any dump () {
         return _h;
     }
 

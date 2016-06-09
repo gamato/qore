@@ -79,18 +79,19 @@ public class MathTest inherits QUnit::Test {
         list x = ('a', 'b', 'c', 'a', 'b', 'a');
         hash exp = {'a': 3, 'b': 2, 'c': 1};
         any c = class_creator (x);
-        assertEq (sort(x), class_creator(x).elems(), class_name + ": create from list");
-        assertEq (sort(x), class_creator(x.iterator()).elems(), class_name + ": create from list iterator");
-        assertEq (sort(x), class_creator(exp).elems(), class_name + ": create from hash");
-        assertEq (sort(x), class_creator(exp.pairIterator()).elems(), class_name + ": create from hash iterator");
-        assertEq (sort(x), class_creator(class_creator(x)).elems(), class_name + ": create from " + class_name);
-        # assertEq (exp, c.items(), class_name + ": items");
-        # assertEq (sort(x), sort(c.elems()), class_name + ": elems");
+        assertEq (list(), class_creator().items(), class_name + ": create from nothing");
+        assertEq (sort(x), class_creator(x).items(), class_name + ": create from list");
+        assertEq (sort(x), class_creator(x.iterator()).items(), class_name + ": create from list iterator");
+        assertEq (sort(x), class_creator(exp).items(), class_name + ": create from hash");
+        assertEq (sort(x), class_creator(exp.pairIterator()).items(), class_name + ": create from hash iterator");
+        assertEq (sort(x), class_creator(class_creator(x)).items(), class_name + ": create from " + class_name);
+        assertEq (sort(x), sort(c.items()), class_name + ": items");
+        assertEq (hash2list(exp), c.pairs(), class_name + ": pairs");
         # most_common
         assertEq (hash2list(exp), c.most_common(), class_name + ": most_common()");
         assertEq (hash2list({}), c.most_common(0), class_name + ": most_common(0)");
-        foreach int i in (range(1, c.items().size() + 1)) {
-            list kp = list km = c.items().keys();
+        foreach int i in (range(1, c.pairs().size() + 1)) {
+            list kp = list km = map $1[0].toString(), c.pairs(); # c.dump().keys()
             splice kp, i;
             km = extract km, -i;
             assertEq (hash2list(exp.(kp)), c.most_common(i), sprintf ("%s: most_common(%d)", class_name, i));
@@ -105,10 +106,11 @@ public class MathTest inherits QUnit::Test {
         c.subtract (('d',));
         c.subtract ({'a': 30, 'b': 20});
         c.subtract (listmul('a', 300) + listmul('b', 200));
-        assertEq (sort(x), sort(c.elems()), class_name + ": subtract");
+        assertEq (sort(x), sort(c.items()), class_name + ": subtract");
         c.subtract (x);
-        assertEq (list(), c.elems(), class_name + ": subtract to zero - elems");
-        assertEq ((('a', 0), ('b', 0), ('c', 0), ('d', 0)), c.most_common(), class_name + ": subtract to zero - items");
+        assertEq (list(), c.items(), class_name + ": subtract to zero - items");
+        assertEq (list(), c.pairs(), class_name + ": subtract to zero - pairs");
+        assertEq ((('a', 0), ('b', 0), ('c', 0), ('d', 0)), c.most_common(), class_name + ": subtract to zero - most_common");
         # count
         c = class_creator (x);
         assertEq (3, c.count('a'), class_name + ": count existing");
@@ -116,8 +118,8 @@ public class MathTest inherits QUnit::Test {
         assertEq (0, c.count(), class_name + ": count no value");
         # clear
         c.clear();
-        assertEq ((), c.elems(), class_name + ": clear - elems");
-        assertEq ({}, c.items(), class_name + ": clear - items");
+        assertEq ((), c.items(), class_name + ": clear - items");
+        assertEq ((), c.pairs(), class_name + ": clear - pairs");
     }
 
     test_factorial() {
