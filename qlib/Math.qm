@@ -280,6 +280,7 @@ list sub Math::listmul (softlist arg, softint num) {
     return r;
 }
 
+
 /**
     Class for counting hashable items.  Sometimes called a counter or bag or multiset.
 
@@ -327,9 +328,12 @@ public class Math::AbstractMultiset {
     abstract clear ();
     abstract int count (any x);
     abstract list items ();
+    abstract AbstractIterator item_iterator ();
     abstract list pairs ();
+    abstract AbstractIterator pair_iterator ();
     abstract list most_common (*int n);
 }
+
 
 /**
     Class for counting hashable items.  Sometimes called a counter or bag or multiset.
@@ -429,6 +433,15 @@ public class Math::Multiset inherits Math::AbstractMultiset {
         return r;
     }
 
+    #! Return an iterator returning all elements repeating each as many times as its count.
+    /**
+        If an element’s count is less than one, item_iterator() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    AbstractIterator item_iterator () {
+        return new MultisetItemIterator (_h.iterator());
+    }
+
     #! Return all elements as a list of (value, count) pairs.
     /**
         If an element’s count is less than one, pairs() will ignore it.
@@ -436,6 +449,15 @@ public class Math::Multiset inherits Math::AbstractMultiset {
     */
     list pairs () {
         return map ($1.value, $1.count), _h.iterator(), $1.count > 0;
+    }
+
+    #! Return an iterator returning all elements as a list of (value, count) pairs.
+    /**
+        If an element’s count is less than one, pair_iterator() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    AbstractIterator pair_iterator () {
+        return new MultisetPairIterator (_h.iterator());
     }
 
     #! Return internal hash structure. Note: not part of API; implementation specific (!)
@@ -460,6 +482,64 @@ public class Math::Multiset inherits Math::AbstractMultiset {
         return s;
     }
 }
+
+class Math::MultisetItemIterator inherits AbstractIterator {
+    private {
+        HashIterator _iter;
+        any _value;
+        int _count;
+    }
+
+    constructor (HashIterator iter) {
+        _iter = iter;
+    }
+
+    bool valid() {
+        return _iter.valid();
+    }
+
+    bool next() {
+        if (_count)
+            return True;
+        return _iter.next();
+    }
+
+    any getValue() {
+        if (!_count) {
+            hash h = _iter.getValue();
+            _value = h.value;
+            _count = h.count;
+        }
+        _count -= 1;
+        return _value;
+    }
+}
+
+class Math::MultisetPairIterator inherits AbstractIterator {
+    private {
+        HashIterator _iter;
+        any _value;
+        int _count;
+    }
+
+    constructor (HashIterator iter) {
+        _iter = iter;
+    }
+
+    bool valid() {
+        return _iter.valid();
+    }
+
+    bool next() {
+        return _iter.next();
+    }
+
+    any getValue() {
+        hash h = _iter.getValue();
+        return (h.value, h.count);
+    }
+}
+
 
 /**
     Class for counting hashable items.  Sometimes called a counter or bag or multiset.
@@ -515,6 +595,15 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
         return r;
     }
 
+    #! Return an iterator returning all elements repeating each as many times as its count.
+    /**
+        If an element’s count is less than one, item_iterator() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    AbstractIterator item_iterator () {
+        return new UnsafeMultisetItemIterator (_h.pairIterator());
+    }
+
     #! Return all elements as a list of (value, count) pairs.
     /**
         If an element’s count is less than one, pairs() will ignore it.
@@ -522,6 +611,15 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     */
     list pairs () {
         return map ($1.key, $1.value), _h.pairIterator(), $1.value > 0;
+    }
+
+    #! Return an iterator returning all elements as a list of (value, count) pairs.
+    /**
+        If an element’s count is less than one, pair_iterator() will ignore it.
+        Elements are returned in arbitrary order.
+    */
+    AbstractIterator pair_iterator () {
+        return new UnsafeMultisetPairIterator (_h.pairIterator());
     }
 
     #! Return internal hash structure. Note: not part of API; implementation specific (!)
@@ -544,6 +642,63 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
             else if (-n < s.size())
                 splice s, 0, s.size() + n;
         return s;
+    }
+}
+
+class Math::UnsafeMultisetItemIterator inherits AbstractIterator {
+    private {
+        HashPairIterator _iter;
+        any _value;
+        int _count;
+    }
+
+    constructor (HashPairIterator iter) {
+        _iter = iter;
+    }
+
+    bool valid() {
+        return _iter.valid();
+    }
+
+    bool next() {
+        if (_count)
+            return True;
+        return _iter.next();
+    }
+
+    any getValue() {
+        if (!_count) {
+            hash h = _iter.getValue();
+            _value = h.key;
+            _count = h.value;
+        }
+        _count -= 1;
+        return _value;
+    }
+}
+
+class Math::UnsafeMultisetPairIterator inherits AbstractIterator {
+    private {
+        HashPairIterator _iter;
+        any _value;
+        int _count;
+    }
+
+    constructor (HashPairIterator iter) {
+        _iter = iter;
+    }
+
+    bool valid() {
+        return _iter.valid();
+    }
+
+    bool next() {
+        return _iter.next();
+    }
+
+    any getValue() {
+        hash h = _iter.getValue();
+        return (h.key, h.value);
     }
 }
 
