@@ -344,6 +344,12 @@ public class Math::AbstractMultiset {
     abstract list most_common (*int n);
 }
 
+class Math::AbstractMultisetItemIterator inherits AbstractIterator {
+}
+
+class Math::AbstractMultisetPairIterator inherits AbstractIterator {
+}
+
 
 /**
     Class for counting hashable items.  Sometimes called a counter or bag or multiset.
@@ -521,7 +527,7 @@ public class Math::Multiset inherits Math::AbstractMultiset {
     }
 }
 
-class Math::MultisetItemIterator inherits AbstractIterator {
+class Math::MultisetItemIterator inherits Math::AbstractMultisetItemIterator {
     private {
         HashIterator _iter;
         any _value;
@@ -553,11 +559,9 @@ class Math::MultisetItemIterator inherits AbstractIterator {
     }
 }
 
-class Math::MultisetPairIterator inherits AbstractIterator {
+class Math::MultisetPairIterator inherits Math::AbstractMultisetPairIterator {
     private {
         HashIterator _iter;
-        any _value;
-        int _count;
     }
 
     constructor (HashIterator iter) {
@@ -695,7 +699,7 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     }
 }
 
-class Math::UnsafeMultisetItemIterator inherits AbstractIterator {
+class Math::UnsafeMultisetItemIterator inherits Math::AbstractMultisetItemIterator {
     private {
         HashPairIterator _iter;
         any _value;
@@ -727,11 +731,9 @@ class Math::UnsafeMultisetItemIterator inherits AbstractIterator {
     }
 }
 
-class Math::UnsafeMultisetPairIterator inherits AbstractIterator {
+class Math::UnsafeMultisetPairIterator inherits Math::AbstractMultisetPairIterator {
     private {
         HashPairIterator _iter;
-        any _value;
-        int _count;
     }
 
     constructor (HashPairIterator iter) {
