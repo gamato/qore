@@ -100,16 +100,16 @@ public class MathTest inherits QUnit::Test {
             assertEq (hash2list(exp.(kp)), c.most_common(i), sprintf ("%s: most_common(%d)", class_name, i));
             assertEq (hash2list(exp.(km)), c.most_common(-i), sprintf ("%s: most_common(%d)", class_name, -i));
         }
-        # update
-        c.update (('d',));
+        # add + update
+        c.add ('d');
         c.update ({'a': 30, 'b': 20});
         c.update (listmul('a', 300) + listmul('b', 200));
-        assertEq ((('a', 333), ('b', 222), ('c', 1), ('d', 1)), c.most_common(), class_name + ": update");
-        # subtract
-        c.subtract (('d',));
+        assertEq ((('a', 333), ('b', 222), ('c', 1), ('d', 1)), c.most_common(), class_name + ": add + update");
+        # discard + subtract
+        c.discard ('d');
         c.subtract ({'a': 30, 'b': 20});
         c.subtract (listmul('a', 300) + listmul('b', 200));
-        assertEq (sort(x), sort(c.items()), class_name + ": subtract");
+        assertEq (sort(x), sort(c.items()), class_name + ": discard + subtract");
         c.subtract (x);
         assertEq (list(), c.items(), class_name + ": subtract to zero - items");
         assertEq (list(), c.pairs(), class_name + ": subtract to zero - pairs");

@@ -295,6 +295,16 @@ public class Math::AbstractMultiset {
             self.update(x);
     }
 
+    #! Insert an element (once or more) into the multiset.
+    add (any item, int count = 1) {
+        self.update (listmul (item, count));
+    }
+
+    #! Remove an element (once or more) from the multiset.
+    discard (any item, int count = 1) {
+        self.subtract (listmul (item, count));
+    }
+
     abstract update (Qore::ListIterator x);
     abstract update (Qore::HashPairIterator x);
 
@@ -349,6 +359,34 @@ public class Math::Multiset inherits Math::AbstractMultiset {
     }
 
     constructor (any x) : AbstractMultiset (x) {
+    }
+
+    #! Insert an element (once or more) into the multiset.
+    add (any item, int count = 1) {
+        string k = item.toString();
+        if (!exists _h.(k)) {
+            _h.(k) = { 'count': count, 'value': item, 'type': item.typeCode() };
+            continue;
+        }
+        reference r = \_h.(k);
+        if (r.type != item.typeCode() || r.value != item)
+            throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                    item.type(), item, TypeCodeMap.(r.type), r.value);
+        r.count += count;
+    }
+
+    #! Remove an element (once or more) from the multiset.
+    discard (any item, int count = 1) {
+        string k = item.toString();
+        if (!exists _h.(k)) {
+            _h.(k) = { 'count': -count, 'value': item, 'type': item.typeCode() };
+            continue;
+        }
+        reference r = \_h.(k);
+        if (r.type != item.typeCode() || r.value != item)
+            throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                    item.type(), item, TypeCodeMap.(r.type), r.value);
+        r.count -= count;
     }
 
     update (Qore::ListIterator x) {
@@ -555,6 +593,16 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     }
 
     constructor (any x) : AbstractMultiset (x) {
+    }
+
+    #! Insert an element (once or more) into the multiset.
+    add (any item, int count = 1) {
+        _h.(item.toString()) += count;
+    }
+
+    #! Remove an element (once or more) from the multiset.
+    discard (any item, int count = 1) {
+        _h.(item.toString()) -= count;
     }
 
     update (Qore::ListIterator x) {
