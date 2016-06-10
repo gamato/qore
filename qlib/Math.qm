@@ -537,19 +537,19 @@ class Math::MultisetItemIterator inherits AbstractIterator {
     }
 
     bool next() {
-        if (_count)
-            return True;
-        return _iter.next();
-    }
-
-    any getValue() {
-        if (!_count) {
+        while (!(_count > 0) && _iter.next()) {
             hash h = _iter.getValue();
             _value = h.value;
             _count = h.count;
         }
         _count -= 1;
-        return _value;
+        return _iter.valid();
+    }
+
+    any getValue() {
+        if (_iter.valid())
+            return _value;
+        _iter.getValue(); # force ITERATOR-ERROR builtin exception
     }
 }
 
@@ -569,7 +569,9 @@ class Math::MultisetPairIterator inherits AbstractIterator {
     }
 
     bool next() {
-        return _iter.next();
+        while (_iter.next() && !(_iter.getValue().count > 0)) {
+        }
+        return _iter.valid();
     }
 
     any getValue() {
@@ -709,19 +711,19 @@ class Math::UnsafeMultisetItemIterator inherits AbstractIterator {
     }
 
     bool next() {
-        if (_count)
-            return True;
-        return _iter.next();
-    }
-
-    any getValue() {
-        if (!_count) {
+        while (!(_count > 0) && _iter.next()) {
             hash h = _iter.getValue();
             _value = h.key;
             _count = h.value;
         }
         _count -= 1;
-        return _value;
+        return _iter.valid();
+    }
+
+    any getValue() {
+        if (_iter.valid())
+            return _value;
+        _iter.getValue(); # force ITERATOR-ERROR builtin exception
     }
 }
 
@@ -741,7 +743,9 @@ class Math::UnsafeMultisetPairIterator inherits AbstractIterator {
     }
 
     bool next() {
-        return _iter.next();
+        while (_iter.next() && !(_iter.getValue().value > 0)) {
+        }
+        return _iter.valid();
     }
 
     any getValue() {

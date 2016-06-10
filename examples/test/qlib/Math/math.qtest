@@ -113,6 +113,8 @@ public class MathTest inherits QUnit::Test {
         c.subtract (x);
         assertEq (list(), c.items(), class_name + ": subtract to zero - items");
         assertEq (list(), c.pairs(), class_name + ": subtract to zero - pairs");
+        assertEq (list(), (map $1, c.item_iterator()), class_name + ": subtract to zero - item_iterator");
+        assertEq (list(), (map $1, c.pair_iterator()), class_name + ": subtract to zero - pair_iterator");
         assertEq ((('a', 0), ('b', 0), ('c', 0), ('d', 0)), c.most_common(), class_name + ": subtract to zero - most_common");
         # count
         c = class_creator (x);
@@ -123,6 +125,8 @@ public class MathTest inherits QUnit::Test {
         c.clear();
         assertEq ((), c.items(), class_name + ": clear - items");
         assertEq ((), c.pairs(), class_name + ": clear - pairs");
+        assertEq ((), (map $1, c.item_iterator()), class_name + ": clear - item_iterator");
+        assertEq ((), (map $1, c.pair_iterator()), class_name + ": clear - pair_iterator");
     }
 
     test_factorial() {
