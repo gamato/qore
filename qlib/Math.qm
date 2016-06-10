@@ -296,43 +296,79 @@ public class Math::AbstractMultiset {
     }
 
     #! Insert an element (once or more) into the multiset.
-    add (any item, int count = 1) {
-        self.update (listmul (item, count));
-    }
+    abstract add (any item, int count = 1);
 
     #! Remove an element (once or more) from the multiset.
-    discard (any item, int count = 1) {
-        self.subtract (listmul (item, count));
+    abstract discard (any item, int count = 1);
+
+    #! Read elements from a ListIterator and insert each into the multiset.
+    update (Qore::ListIterator x) {
+        map self.add ($1), x;
     }
 
-    abstract update (Qore::ListIterator x);
-    abstract update (Qore::HashPairIterator x);
+    #! Read (element: count) from a HashPairIterator and insert each into the multiset.
+    update (Qore::HashPairIterator x) {
+        map self.add ($1.key, $1.value), x;
+    }
 
-    abstract subtract (Qore::ListIterator x);
-    abstract subtract (Qore::HashPairIterator x);
-
+    #! Read elements from a list and insert each into the multiset.
     update (list x) {
         self.update (x.iterator());
     }
 
+    #! Read (element: count) from a hash and insert each into the multiset.
     update (hash x) {
         self.update (x.pairIterator());
     }
 
-    update (AbstractMultiset x) {
-        self.update (x.items().iterator());
+    #! Insert all elements found in the other multiset into this multiset.
+    update (AbstractMultiset other) {
+        self.update (other.pair_iterator());
     }
 
+    #! Read elements from item_iterator() call and insert each into the multiset.
+    update (Math::AbstractMultisetItemIterator x) {
+        map self.add ($1), x;
+    }
+
+    #! Read (element: count) from pair_iterator() call and insert each into the multiset.
+    update (Math::AbstractMultisetPairIterator x) {
+        map self.add ($1[0], $1[1]), x;
+    }
+
+    #! Read elements from a ListIterator and remove each from the multiset.
+    subtract (Qore::ListIterator x) {
+        map self.discard ($1), x;
+    }
+
+    #! Read (element: count) from a HashPairIterator and remove each from the multiset.
+    subtract (Qore::HashPairIterator x) {
+        map self.discard ($1.key, $1.value), x;
+    }
+
+    #! Read elements from a list and remove each from the multiset.
     subtract (list x) {
         self.subtract (x.iterator());
     }
 
+    #! Read (element: count) from a hash and remove each from the multiset.
     subtract (hash x) {
         self.subtract (x.pairIterator());
     }
 
-    subtract (AbstractMultiset x) {
-        self.subtract (x.items().iterator());
+    #! Remove all elements found in the other multiset from this multiset.
+    subtract (AbstractMultiset other) {
+        self.subtract (other.pair_iterator());
+    }
+
+    #! Read elements from item_iterator() call and remove each from the multiset.
+    subtract (Math::AbstractMultisetItemIterator x) {
+        map self.discard ($1), x;
+    }
+
+    #! Read (element: count) from pair_iterator() call and remove each from the multiset.
+    subtract (Math::AbstractMultisetPairIterator x) {
+        map self.discard ($1[0], $1[1]), x;
     }
 
     abstract clear ();
@@ -611,20 +647,44 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
         _h.(item.toString()) -= count;
     }
 
+    #! Read elements from a ListIterator and insert each into the multiset.
     update (Qore::ListIterator x) {
         map _h.($1.toString()) += 1, x;
     }
 
+    #! Read (element: count) from a HashPairIterator and insert each into the multiset.
     update (Qore::HashPairIterator x) {
         map _h.($1.key) += $1.value, x;
     }
 
+    #! Read elements from item_iterator() call and insert each into the multiset.
+    update (Math::AbstractMultisetItemIterator x) {
+        map _h.($1.toString()) += 1, x;
+    }
+
+    #! Read (element: count) from pair_iterator() call and insert each into the multiset.
+    update (Math::AbstractMultisetPairIterator x) {
+        map _h.($1[0].toString()) += $1[1], x;
+    }
+
+    #! Read elements from a ListIterator and remove each from the multiset.
     subtract (Qore::ListIterator x) {
         map _h.($1.toString()) -= 1, x;
     }
 
+    #! Read (element: count) from a HashPairIterator and remove each from the multiset.
     subtract (Qore::HashPairIterator x) {
         map _h.($1.key) -= $1.value, x;
+    }
+
+    #! Read elements from item_iterator() call and remove each from the multiset.
+    subtract (Math::AbstractMultisetItemIterator x) {
+        map _h.($1.toString()) -= 1, x;
+    }
+
+    #! Read (element: count) from pair_iterator() call and remove each from the multiset.
+    subtract (Math::AbstractMultisetPairIterator x) {
+        map _h.($1[0].toString()) -= $1[1], x;
     }
 
     #! Remove all elements from the multiset.

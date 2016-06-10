@@ -79,17 +79,20 @@ public class MathTest inherits QUnit::Test {
         list x = ('a', 'b', 'c', 'a', 'b', 'a');
         hash exp = {'a': 3, 'b': 2, 'c': 1};
         any c = class_creator (x);
-        assertEq (list(), class_creator().items(), class_name + ": create from nothing");
-        assertEq (sort(x), class_creator(x).items(), class_name + ": create from list");
-        assertEq (sort(x), class_creator(x.iterator()).items(), class_name + ": create from list iterator");
-        assertEq (sort(x), class_creator(exp).items(), class_name + ": create from hash");
-        assertEq (sort(x), class_creator(exp.pairIterator()).items(), class_name + ": create from hash iterator");
-        assertEq (sort(x), class_creator(class_creator(x)).items(), class_name + ": create from " + class_name);
         # elements + iterators
         assertEq (sort(x), sort(c.items()), class_name + ": items");
         assertEq (hash2list(exp), c.pairs(), class_name + ": pairs");
         assertEq (c.items(), (map $1, c.item_iterator()), class_name + ": item_iterator");
         assertEq (c.pairs(), (map $1, c.pair_iterator()), class_name + ": pair_iterator");
+        # constructors
+        assertEq (list(), class_creator().items(), class_name + ": create from nothing");
+        assertEq (sort(x), class_creator(x).items(), class_name + ": create from list");
+        assertEq (sort(x), class_creator(x.iterator()).items(), class_name + ": create from list iterator");
+        assertEq (sort(x), class_creator(exp).items(), class_name + ": create from hash");
+        assertEq (sort(x), class_creator(exp.pairIterator()).items(), class_name + ": create from hash iterator");
+        assertEq (sort(x), class_creator(c.item_iterator()).items(), class_name + ": create from item_iterator");
+        assertEq (sort(x), class_creator(c.pair_iterator()).items(), class_name + ": create from pair_iterator");
+        assertEq (sort(x), class_creator(class_creator(x)).items(), class_name + ": create from " + class_name);
         # most_common
         assertEq (hash2list(exp), c.most_common(), class_name + ": most_common()");
         assertEq (hash2list({}), c.most_common(0), class_name + ": most_common(0)");
