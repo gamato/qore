@@ -292,7 +292,7 @@ public class Math::AbstractMultiset {
 
     constructor (any x) {
         if (exists x)
-            self.update(x);
+            self.merge(x);
     }
 
     #! Insert an element (once or more) into the multiset.
@@ -302,37 +302,37 @@ public class Math::AbstractMultiset {
     abstract discard (any item, int count = 1);
 
     #! Read elements from a ListIterator and insert each into the multiset.
-    update (Qore::ListIterator x) {
+    merge (Qore::ListIterator x) {
         map self.add ($1), x;
     }
 
     #! Read (element: count) from a HashPairIterator and insert each into the multiset.
-    update (Qore::HashPairIterator x) {
+    merge (Qore::HashPairIterator x) {
         map self.add ($1.key, $1.value), x;
     }
 
     #! Read elements from a list and insert each into the multiset.
-    update (list x) {
-        self.update (x.iterator());
+    merge (list x) {
+        self.merge (x.iterator());
     }
 
     #! Read (element: count) from a hash and insert each into the multiset.
-    update (hash x) {
-        self.update (x.pairIterator());
+    merge (hash x) {
+        self.merge (x.pairIterator());
     }
 
     #! Insert all elements found in the other multiset into this multiset.
-    update (AbstractMultiset other) {
-        self.update (other.pair_iterator());
+    merge (AbstractMultiset other) {
+        self.merge (other.pair_iterator());
     }
 
     #! Read elements from item_iterator() call and insert each into the multiset.
-    update (Math::AbstractMultisetItemIterator x) {
+    merge (Math::AbstractMultisetItemIterator x) {
         map self.add ($1), x;
     }
 
     #! Read (element: count) from pair_iterator() call and insert each into the multiset.
-    update (Math::AbstractMultisetPairIterator x) {
+    merge (Math::AbstractMultisetPairIterator x) {
         map self.add ($1[0], $1[1]), x;
     }
 
@@ -602,22 +602,22 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     }
 
     #! Read elements from a ListIterator and insert each into the multiset.
-    update (Qore::ListIterator x) {
+    merge (Qore::ListIterator x) {
         map _h.($1.toString()) += 1, x;
     }
 
     #! Read (element: count) from a HashPairIterator and insert each into the multiset.
-    update (Qore::HashPairIterator x) {
+    merge (Qore::HashPairIterator x) {
         map _h.($1.key) += $1.value, x;
     }
 
     #! Read elements from item_iterator() call and insert each into the multiset.
-    update (Math::AbstractMultisetItemIterator x) {
+    merge (Math::AbstractMultisetItemIterator x) {
         map _h.($1.toString()) += 1, x;
     }
 
     #! Read (element: count) from pair_iterator() call and insert each into the multiset.
-    update (Math::AbstractMultisetPairIterator x) {
+    merge (Math::AbstractMultisetPairIterator x) {
         map _h.($1[0].toString()) += $1[1], x;
     }
 

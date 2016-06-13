@@ -103,11 +103,11 @@ public class MathTest inherits QUnit::Test {
             assertEq (hash2list(exp.(kp)), c.most_common(i), sprintf ("%s: most_common(%d)", class_name, i));
             assertEq (hash2list(exp.(km)), c.most_common(-i), sprintf ("%s: most_common(%d)", class_name, -i));
         }
-        # add + update
+        # add + merge
         c.add ('d');
-        c.update ({'a': 30, 'b': 20});
-        c.update (listmul('a', 300) + listmul('b', 200));
-        assertEq ((('a', 333), ('b', 222), ('c', 1), ('d', 1)), c.most_common(), class_name + ": add + update");
+        c.merge ({'a': 30, 'b': 20});
+        c.merge (listmul('a', 300) + listmul('b', 200));
+        assertEq ((('a', 333), ('b', 222), ('c', 1), ('d', 1)), c.most_common(), class_name + ": add + merge");
         # discard + subtract
         c.discard ('d');
         c.subtract ({'a': 30, 'b': 20});
