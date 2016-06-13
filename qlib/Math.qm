@@ -431,66 +431,6 @@ public class Math::Multiset inherits Math::AbstractMultiset {
         r.count -= count;
     }
 
-    update (Qore::ListIterator x) {
-        foreach any item in (x) {
-            string k = item.toString();
-            if (!exists _h.(k)) {
-                _h.(k) = { 'count': 1, 'value': item, 'type': item.typeCode() };
-                continue;
-            }
-            reference r = \_h.(k);
-            if (r.type != item.typeCode() || r.value != item)
-                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
-                                                 item.type(), item, TypeCodeMap.(r.type), r.value);
-            r.count += 1;
-        }
-    }
-
-    update (Qore::HashPairIterator x) {
-        foreach hash h in (x) {
-            string k = h.key;
-            if (!exists _h.(k)) {
-                _h.(k) = { 'count': h.value, 'value': k, 'type': k.typeCode() };
-                continue;
-            }
-            reference r = \_h.(k);
-            if (r.type != k.typeCode() || r.value != k)
-                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
-                                                 k.type(), k, TypeCodeMap.(r.type), r.value);
-            r.count += h.value;
-        }
-    }
-
-    subtract (Qore::ListIterator x) {
-        foreach any item in (x) {
-            string k = item.toString();
-            if (!exists _h.(k)) {
-                _h.(k) = { 'count': -1, 'value': item, 'type': item.typeCode() };
-                continue;
-            }
-            reference r = \_h.(k);
-            if (r.type != item.typeCode() || r.value != item)
-                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
-                                                 item.type(), item, TypeCodeMap.(r.type), r.value);
-            r.count += -1;
-        }
-    }
-
-    subtract (Qore::HashPairIterator x) {
-        foreach hash h in (x) {
-            string k = h.key;
-            if (!exists _h.(k)) {
-                _h.(k) = { 'count': -h.value, 'value': k, 'type': k.typeCode() };
-                continue;
-            }
-            reference r = \_h.(k);
-            if (r.type != k.typeCode() || r.value != k)
-                throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
-                                                 k.type(), k, TypeCodeMap.(r.type), r.value);
-            r.count += -h.value;
-        }
-    }
-
     #! Remove all elements from the multiset.
     clear () {
         _h = {};
