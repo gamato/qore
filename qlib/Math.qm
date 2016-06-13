@@ -438,6 +438,16 @@ public class Math::Multiset inherits Math::AbstractMultiset {
         r.count -= count;
     }
 
+    #! Insert all elements found in the other multiset into this multiset.
+    merge (Math::Multiset other) {
+        map self.add ($1.value, $1.count), other.dump().iterator();
+    }
+
+    #! Remove all elements found in the other multiset from this multiset.
+    subtract (Math::Multiset other) {
+        map self.discard ($1.value, $1.count), other.dump().iterator();
+    }
+
     #! Remove all elements from the multiset.
     clear () {
         _h = {};
@@ -621,6 +631,11 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
         map _h.($1[0].toString()) += $1[1], x;
     }
 
+    #! Insert all elements found in the other multiset into this multiset.
+    merge (Math::UnsafeMultiset other) {
+        map _h.($1.key) += $1.value, other.dump().pairIterator();
+    }
+
     #! Read elements from a ListIterator and remove each from the multiset.
     subtract (Qore::ListIterator x) {
         map _h.($1.toString()) -= 1, x;
@@ -639,6 +654,11 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     #! Read (element: count) from pair_iterator() call and remove each from the multiset.
     subtract (Math::AbstractMultisetPairIterator x) {
         map _h.($1[0].toString()) -= $1[1], x;
+    }
+
+    #! Remove all elements found in the other multiset from this multiset.
+    subtract (Math::UnsafeMultiset other) {
+        map _h.($1.key) -= $1.value, other.dump().pairIterator();
     }
 
     #! Remove all elements from the multiset.
