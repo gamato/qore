@@ -119,13 +119,15 @@ public class MathTest inherits QUnit::Test {
         assertEq (list(), (map $1, c.item_iterator()), class_name + ": subtract to zero - item_iterator");
         assertEq (list(), (map $1, c.pair_iterator()), class_name + ": subtract to zero - pair_iterator");
         assertEq ((('a', 0), ('b', 0), ('c', 0), ('d', 0)), c.most_common(), class_name + ": subtract to zero - most_common");
-        # count
+        # count + size
         c = class_creator (x);
         assertEq (3, c.count('a'), class_name + ": count existing");
         assertEq (0, c.count('x'), class_name + ": count missing");
         assertEq (0, c.count(), class_name + ": count no value");
+        assertEq (6, c.size(), class_name + ": size");
         # clear
         c.clear();
+        assertEq (0, c.size(), class_name + ": clear - size");
         assertEq ((), c.items(), class_name + ": clear - items");
         assertEq ((), c.pairs(), class_name + ": clear - pairs");
         assertEq ((), (map $1, c.item_iterator()), class_name + ": clear - item_iterator");

@@ -378,6 +378,13 @@ public class Math::AbstractMultiset {
     abstract list pairs ();
     abstract AbstractIterator pair_iterator ();
     abstract list most_common (*int n);
+
+    #! Return the number of elements in this multiset (its cardinality).
+    int size () {
+        int s = 0;
+        map s += $1[1], self.pair_iterator();
+        return s;
+    }
 }
 
 class Math::AbstractMultisetItemIterator inherits AbstractIterator {
@@ -499,6 +506,13 @@ public class Math::Multiset inherits Math::AbstractMultiset {
                 splice s, n;
             else if (-n < s.size())
                 splice s, 0, s.size() + n;
+        return s;
+    }
+
+    #! Return the number of elements in this multiset (its cardinality).
+    int size () {
+        int s = 0;
+        map s += $1.count, _h.iterator();
         return s;
     }
 }
@@ -695,6 +709,13 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
                 splice s, n;
             else if (-n < s.size())
                 splice s, 0, s.size() + n;
+        return s;
+    }
+
+    #! Return the number of elements in this multiset (its cardinality).
+    int size () {
+        int s = 0;
+        map s += $1, _h.iterator();
         return s;
     }
 }
