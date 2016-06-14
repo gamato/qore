@@ -379,6 +379,11 @@ public class Math::AbstractMultiset {
     abstract AbstractIterator pair_iterator ();
     abstract list most_common (*int n);
 
+    #! Return True if the multiset is empty (size = 0), False if not.
+    bool empty () {
+        return ! boolean (self.size());
+    }
+
     #! Return the number of elements in this multiset (its cardinality).
     int size () {
         int s = 0;
