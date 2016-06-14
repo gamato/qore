@@ -372,12 +372,17 @@ public class Math::AbstractMultiset {
     }
 
     abstract clear ();
-    abstract int count (any x);
+    abstract int count (any item);
     abstract list items ();
     abstract AbstractIterator item_iterator ();
     abstract list pairs ();
     abstract AbstractIterator pair_iterator ();
     abstract list most_common (*int n);
+
+    #! Return True if the multiset contains a specified element, False if not.
+    bool contains (any item) {
+        return boolean (self.count(item));
+    }
 
     #! Return True if the multiset is empty (size = 0), False if not.
     bool empty () {
@@ -459,8 +464,8 @@ public class Math::Multiset inherits Math::AbstractMultiset {
     }
 
     #! Return number of occurrences of an element.
-    int count (any x) {
-        int c = _h.(x.toString()).count ?? 0;
+    int count (any item) {
+        int c = _h.(item.toString()).count ?? 0;
         return c > 0 ? c : 0;
     }
 
@@ -672,8 +677,8 @@ public class Math::UnsafeMultiset inherits Math::AbstractMultiset {
     }
 
     #! Return number of occurrences of an element.
-    int count (any x) {
-        int c = _h.(x.toString()) ?? 0;
+    int count (any item) {
+        int c = _h.(item.toString()) ?? 0;
         return c > 0 ? c : 0;
     }
 
