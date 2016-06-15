@@ -484,6 +484,12 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
 
     # ---------- mathematical set operations ----------
 
+    #! Remove all elements from this set that are not contained in the other set.
+    intersect (Math::UnsafeSet other) {
+        hash d = other.dump();
+        map delete _h.($1), _h.keyIterator(), !exists d.($1);
+    }
+
     #! Read elements from a ListIterator and insert each into the set.
     merge (Qore::ListIterator x) {
         map _h.($1.toString()) = True, x;
@@ -494,6 +500,11 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
         map _h.($1.toString()) = True, x;
     }
 
+    #! Insert all elements found in the other set into this set.
+    merge (Math::UnsafeSet other) {
+        map _h.($1) = True, other.dump().keyIterator();
+    }
+
     #! Read elements from a ListIterator and remove each from the set.
     subtract (Qore::ListIterator x) {
         map delete _h.($1.toString()), x;
@@ -502,6 +513,23 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
     #! Read elements from item_iterator() call and remove each from the set.
     subtract (Math::AbstractSetItemIterator x) {
         map delete _h.($1.toString()), x;
+    }
+
+    #! Remove all elements found in the other set from this set.
+    subtract (Math::UnsafeSet other) {
+        map delete _h.($1), other.dump().keyIterator();
+    }
+
+    #! Update the set to contain only elements exclusive between this set and the other set.
+    symmetric_subtract (Math::UnsafeSet other) {
+        hash d = other.dump();
+        list i;
+        if (self.size() < other.size())
+            i = map $1, _h.keyIterator(), exists d.($1);
+        else
+            i = map $1, d.keyIterator(), exists _h.($1);
+        self.merge (other);
+        _h -= i;
     }
 
     # ---------- miscellaneous ----------
