@@ -400,6 +400,30 @@ public class Math::AbstractSet {
         return ! boolean (self.size());
     }
 
+    #!  Return True if the other set is equal to this set; otherwise return False.
+    /**
+        Two sets are considered equal if they contain the same elements.
+    */
+    bool equals (AbstractSet other) {
+        if (self.size() != other.size())
+            return False;
+        if (sort (self.items()) != sort (other.items()))
+            return False;
+        return True;
+    }
+
+    bool issubset (AbstractSet other) {
+        int s = 0;
+        map s += 1, self.item_iterator(), other.count($1);
+        return s == self.size();
+    }
+
+    bool issuperset (AbstractSet other) {
+        int s = 0;
+        map s += 1, other.item_iterator(), self.count($1);
+        return s == other.size();
+    }
+
     #! Return the number of elements in this set (its cardinality).
     int size () {
         int s = 0;
