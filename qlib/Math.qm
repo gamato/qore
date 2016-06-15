@@ -281,6 +281,255 @@ list sub Math::listmul (softlist arg, softint num) {
 }
 
 
+#! Class for constructing and manipulating unordered collections of unique elements.
+/**
+    Common uses include membership testing, removing duplicates from a list,
+    and computing standard math operations on sets such as intersection,
+    union, difference, and symmetric difference.
+*/
+public class Math::AbstractSet {
+    private {
+    }
+
+    constructor (any x) {
+        if (exists x)
+            self.merge(x);
+    }
+
+    # ========== Modifiers ==============================
+
+    # ---------- single element operations ----------
+
+    #! Insert an element into the set. Do nothing if it is already there.
+    abstract add (any x);
+
+    #! Remove an element from the set. Do nothing if it is not there.
+    abstract discard (any x);
+
+    # ---------- mathematical set operations ----------
+
+    #! Remove all elements from the set that are not contained in a ListIterator.
+    intersect (Qore::ListIterator x) {
+        # self.intersect (new AbstractSet (x));
+        list i = map $1, x, self.count($1);
+        self.clear();
+        self.merge(i);
+    }
+
+    #! Remove all elements from the set that are not contained in a list.
+    intersect (list x) {
+        self.intersect (x.iterator());
+    }
+
+    #! Remove all elements from this set that are not contained in the other set.
+    intersect (AbstractSet other) {
+        map self.discard ($1), self.item_iterator(), !other.count($1);
+    }
+
+    #! Read elements from a ListIterator and insert each into the set.
+    merge (Qore::ListIterator x) {
+        map self.add ($1), x;
+    }
+
+    #! Read elements from a list and insert each into the set.
+    merge (list x) {
+        self.merge (x.iterator());
+    }
+
+    #! Insert all elements found in the other set into this set.
+    merge (AbstractSet other) {
+        # self.merge (other.item_iterator());
+        self.merge (other.items().iterator());
+    }
+
+    #! Read elements from item_iterator() call and insert each into the set.
+    merge (Math::AbstractSetItemIterator x) {
+        map self.add ($1), x;
+    }
+
+    #! Read elements from a ListIterator and remove each from the set.
+    subtract (Qore::ListIterator x) {
+        map self.discard ($1), x;
+    }
+
+    #! Read elements from a list and remove each from the set.
+    subtract (list x) {
+        self.subtract (x.iterator());
+    }
+
+    #! Remove all elements found in the other set from this set.
+    subtract (AbstractSet other) {
+        # self.subtract (other.item_iterator());
+        self.subtract (other.items().iterator());
+    }
+
+    #! Update the set to contain only elements exclusive between the set and a ListIterator.
+    symmetric_subtract (Qore::ListIterator x) {
+        # self.symmetric_subtract (new AbstractSet (x));
+        list i = map $1, x, self.count($1);
+        self.merge (x);
+        self.subtract (i);
+    }
+
+    #! Update the set to contain only elements exclusive between the set and a list.
+    symmetric_subtract (list x) {
+        self.symmetric_subtract (x.iterator());
+    }
+
+    #! Update the set to contain only elements exclusive between this set and the other set.
+    symmetric_subtract (AbstractSet other) {
+        list i;
+        if (self.size() < other.size())
+            i = map $1, self.item_iterator(), other.count($1);
+        else
+            i = map $1, other.item_iterator(), self.count($1);
+        self.merge (other);
+        self.subtract (i);
+    }
+
+    # ---------- miscellaneous ----------
+
+    abstract clear ();
+
+    # ========== Queries ==============================
+
+    # ---------- mathematical set operations ----------
+
+    #! Return True if the set is empty (size = 0), False if not.
+    bool empty () {
+        return ! boolean (self.size());
+    }
+
+    #! Return the number of elements in this set (its cardinality).
+    int size () {
+        int s = 0;
+        map s += 1, self.item_iterator();
+        return s;
+    }
+
+    # ---------- single element operations ----------
+
+    #! Return True if the set contains a specified element, False if not.
+    bool contains (any x) {
+        return boolean (self.count(x));
+    }
+
+    #! Return number of occurrences of an element (which is either 1 or 0).
+    abstract int count (any x);
+
+    # ========== Miscellaneous ==============================
+
+    abstract list items ();
+    abstract AbstractIterator item_iterator ();
+}
+
+class Math::AbstractSetItemIterator inherits AbstractIterator {
+}
+
+
+#! Class for constructing and manipulating unordered collections of unique elements.
+/**
+    Elements are stored as hash keys and therefore they have to be hashable.
+
+    @note This class is faster than @ref Math::Set but it is not safe to be used with values other than strings.
+*/
+public class Math::UnsafeSet inherits Math::AbstractSet {
+    private {
+        hash _h = {};
+    }
+
+    constructor (any x) : AbstractSet (x) {
+    }
+
+    # ========== Modifiers ==============================
+
+    # ---------- single element operations ----------
+
+    #! Insert an element into the set. Do nothing if it is already there.
+    add (any item) {
+        _h.(item.toString()) = True;
+    }
+
+    #! Remove an element from the set. Do nothing if it is not there.
+    discard (any item) {
+        delete _h.(item.toString());
+    }
+
+    # ---------- miscellaneous ----------
+
+    #! Remove all elements from the set.
+    clear () {
+        _h = {};
+    }
+
+    # ========== Queries ==============================
+
+    # ---------- mathematical set operations ----------
+
+    #! Return the number of elements in this set (its cardinality).
+    int size () {
+        return _h.size();
+    }
+
+    # ---------- single element operations ----------
+
+    #! Return True if the set contains a specified element, False if not.
+    bool contains (any x) {
+        return exists _h.(x.toString());
+    }
+
+    #! Return number of occurrences of an element (which is either 1 or 0).
+    int count (any x) {
+        return exists _h.(x.toString()) ? 1 : 0;
+    }
+
+    # ========== Miscellaneous ==============================
+
+    #! Return internal hash structure. Note: not part of API; implementation specific (!)
+    any dump () {
+        return _h;
+    }
+
+    #! Return all elements.
+    /**
+        Elements are returned in arbitrary order.
+    */
+    list items () {
+        return _h.keys();
+    }
+
+    #! Return an iterator over all elements.
+    /**
+        Elements are returned in arbitrary order.
+    */
+    AbstractIterator item_iterator () {
+        return new UnsafeSetItemIterator (_h.keyIterator());
+    }
+}
+
+class Math::UnsafeSetItemIterator inherits Math::AbstractSetItemIterator {
+    private {
+        HashKeyIterator _iter;
+    }
+
+    constructor (HashKeyIterator iter) {
+        _iter = iter;
+    }
+
+    bool valid() {
+        return _iter.valid();
+    }
+
+    bool next() {
+        return _iter.next();
+    }
+
+    any getValue() {
+        return _iter.getValue();
+    }
+}
+
+
 /**
     Class for counting hashable items.  Sometimes called a counter or bag or multiset.
 

@@ -38,6 +38,7 @@ public class MathTest inherits QUnit::Test {
     constructor() : Test ("MathTest", "1.0") {
         addTestCase ("Test hash/list/string helper functions", \test_hash_list_string());
         addTestCase ("Test listmul helper function", \test_listmul());
+        addTestCase ("Test Set classes", \test_set());
         addTestCase ("Test Multiset classes", \test_multiset());
         addTestCase ("Test factorial function", \test_factorial());
         addTestCase ("Test gamma function", \test_gamma());
@@ -68,6 +69,67 @@ public class MathTest inherits QUnit::Test {
         assertEq (list(), listmul ((1,2), 0), "listmul: num=0");
         assertEq ((1,2), listmul ((1,2), 1), "listmul: num=1");
         assertEq ((1,2,1,2,1,2), listmul ((1,2), 3), "listmul: num>1");
+    }
+
+    test_set() {
+        _test_sets ("UnsafeSet", any sub (any arg) { return new UnsafeSet (arg); });
+    }
+
+    _test_sets (string class_name, code class_creator) {
+        list x = ('a', 'b', 'c', 'a', 'b', 'a');
+        list exp = ('a', 'b', 'c');
+        any c = class_creator (x);
+        any c1 = class_creator (x);
+        any c2 = class_creator (('c', 'd', 'e'));
+        # elements + iterators
+        assertEq (exp, sort(c.items()), class_name + ": items");
+        assertEq (c.items(), (map $1, c.item_iterator()), class_name + ": item_iterator");
+        # constructors
+        assertEq (list(), class_creator().items(), class_name + ": create from nothing");
+        assertEq (exp, class_creator(x).items(), class_name + ": create from list");
+        assertEq (exp, class_creator(x.iterator()).items(), class_name + ": create from list iterator");
+        assertEq (exp, class_creator(c.item_iterator()).items(), class_name + ": create from item_iterator");
+        assertEq (exp, class_creator(class_creator(x)).items(), class_name + ": create from " + class_name);
+        # add + merge
+        c.add ('d');
+        c.merge (listmul('a', 300) + listmul('b', 200));
+        c.merge (c2);
+        assertEq (('a', 'b', 'c', 'd', 'e'), sort(c.items()), class_name + ": add + merge");
+        # discard + subtract
+        c.discard ('d');
+        c.subtract (listmul('a', 300) + listmul('b', 200));
+        c.subtract (c2);
+        assertEq (list(), c.items(), class_name + ": discard + subtract");
+        c = class_creator (x);
+        c.subtract (c);
+        assertEq (list(), c.items(), class_name + ": subtract itself - items");
+        assertEq (list(), (map $1, c.item_iterator()), class_name + ": subtract itself - item_iterator");
+        # intersect
+        c = class_creator (x);
+        c.intersect (c2);
+        c.intersect (('a', 'b', 'c'));
+        assertEq (('c',), sort(c.items()), class_name + ": intersect");
+        # symmetric_subtract
+        c = class_creator (x);
+        c.symmetric_subtract (c2);
+        c.symmetric_subtract (('d', 'e', 'f'));
+        assertEq (('a', 'b', 'f'), sort(c.items()), class_name + ": symmetric_subtract");
+        # contains + count + size + empty
+        c = class_creator (x);
+        assertTrue (c.contains('a'), class_name + ": contains existing");
+        assertFalse (c.contains('x'), class_name + ": contains missing");
+        assertFalse (c.contains(), class_name + ": contains no value");
+        assertEq (1, c.count('a'), class_name + ": count existing");
+        assertEq (0, c.count('x'), class_name + ": count missing");
+        assertEq (0, c.count(), class_name + ": count no value");
+        assertEq (3, c.size(), class_name + ": size");
+        assertFalse (c.empty(), class_name + ": empty");
+        # clear + empty
+        c.clear();
+        assertTrue (c.empty(), class_name + ": clear - empty");
+        assertEq (0, c.size(), class_name + ": clear - size");
+        assertEq ((), c.items(), class_name + ": clear - items");
+        assertEq ((), (map $1, c.item_iterator()), class_name + ": clear - item_iterator");
     }
 
     test_multiset() {
