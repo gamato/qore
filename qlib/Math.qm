@@ -388,6 +388,46 @@ public class Math::AbstractSet {
         self.subtract (i);
     }
 
+    # ---------- mathematical set operations returning new object ----------
+
+    #! Return a new set containing elements common to this set and the other set.
+    any intersection (AbstractSet other) {
+        any n = self.copy();
+        n.clear();
+        if (self.size() < other.size())
+            map n.add($1), self.item_iterator(), other.count($1);
+        else
+            map n.add($1), other.item_iterator(), self.count($1);
+        return n;
+    }
+
+    #! Return a new set built by merging this set and the other set.
+    any union (AbstractSet other) {
+        any n = self.copy();
+        n.clear();
+        n.merge (self);
+        n.merge (other);
+        return n;
+    }
+
+    #! Return a new set containing elements from this set that are not in the other set.
+    object difference (AbstractSet other) {
+        any n = self.copy();
+        n.clear();
+        map n.add($1), self.item_iterator(), !other.count($1);
+        return n;
+    }
+
+    #! Return a new set containing elements exclusive between this set and the other set.
+    object symmetric_difference (AbstractSet other) {
+        any i = self.intersection (other);
+        any n = self.copy();
+        n.clear();
+        map n.add($1), self.item_iterator(), !i.count($1);
+        map n.add($1), other.item_iterator(), !i.count($1);
+        return n;
+    }
+
     # ---------- miscellaneous ----------
 
     abstract clear ();

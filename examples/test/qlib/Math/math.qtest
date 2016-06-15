@@ -114,6 +114,12 @@ public class MathTest inherits QUnit::Test {
         c.symmetric_subtract (c2);
         c.symmetric_subtract (('d', 'e', 'f'));
         assertEq (('a', 'b', 'f'), sort(c.items()), class_name + ": symmetric_subtract");
+        # intersection + union + difference + symmetric_difference
+        c = class_creator (x);
+        assertEq (('c',), sort(c.intersection(c2).items()), class_name + ": intersection");
+        assertEq (('a', 'b', 'c', 'd', 'e'), sort(c.union(c2).items()), class_name + ": union");
+        assertEq (('a', 'b'), sort(c.difference(c2).items()), class_name + ": difference");
+        assertEq (('a', 'b', 'd', 'e'), sort(c.symmetric_difference(c2).items()), class_name + ": symmetric_difference");
         # equals + issubset + issuperset
         c = class_creator (x);
         assertTrue (c.equals (c1), class_name + ": equals");
