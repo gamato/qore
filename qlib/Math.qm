@@ -413,12 +413,14 @@ public class Math::AbstractSet {
         return True;
     }
 
+    #! Return True if every element of this set is in the other set.
     bool issubset (AbstractSet other) {
         int s = 0;
         map s += 1, self.item_iterator(), other.count($1);
         return s == self.size();
     }
 
+    #! Return True if every element of the other set is in this set.
     bool issuperset (AbstractSet other) {
         int s = 0;
         map s += 1, other.item_iterator(), self.count($1);
@@ -512,6 +514,18 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
     # ========== Queries ==============================
 
     # ---------- mathematical set operations ----------
+
+    #! Return True if every element of this set is in the other set.
+    bool issubset (AbstractSet other) {
+        int c = 0;
+        map c += other.count($1), _h.keyIterator();
+        return c == _h.size();
+    }
+
+    #! Return True if every element of the other set is in this set.
+    bool issuperset (AbstractSet other) {
+        return other.issubset(self);
+    }
 
     #! Return the number of elements in this set (its cardinality).
     int size () {
