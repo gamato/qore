@@ -310,7 +310,6 @@ public class Math::AbstractSet {
 
     #! Remove all elements from the set that are not contained in a ListIterator.
     intersect (Qore::ListIterator x) {
-        # self.intersect (new AbstractSet (x));
         list i = map $1, x, self.count($1);
         self.clear();
         self.merge(i);
@@ -338,8 +337,7 @@ public class Math::AbstractSet {
 
     #! Insert all elements found in the other set into this set.
     merge (AbstractSet other) {
-        # self.merge (other.item_iterator());
-        self.merge (other.items().iterator());
+        self.merge (other.item_iterator());
     }
 
     #! Read elements from item_iterator() call and insert each into the set.
@@ -359,13 +357,16 @@ public class Math::AbstractSet {
 
     #! Remove all elements found in the other set from this set.
     subtract (AbstractSet other) {
-        # self.subtract (other.item_iterator());
-        self.subtract (other.items().iterator());
+        self.subtract (other.item_iterator());
+    }
+
+    #! Read elements from item_iterator() call and remove each from the set.
+    subtract (Math::AbstractSetItemIterator x) {
+        map self.discard ($1), x;
     }
 
     #! Update the set to contain only elements exclusive between the set and a ListIterator.
     symmetric_subtract (Qore::ListIterator x) {
-        # self.symmetric_subtract (new AbstractSet (x));
         list i = map $1, x, self.count($1);
         self.merge (x);
         self.subtract (i);
@@ -477,6 +478,28 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
     #! Remove an element from the set. Do nothing if it is not there.
     discard (any item) {
         delete _h.(item.toString());
+    }
+
+    # ---------- mathematical set operations ----------
+
+    #! Read elements from a ListIterator and insert each into the set.
+    merge (Qore::ListIterator x) {
+        map _h.($1.toString()) = True, x;
+    }
+
+    #! Read elements from item_iterator() call and insert each into the set.
+    merge (Math::AbstractSetItemIterator x) {
+        map _h.($1.toString()) = True, x;
+    }
+
+    #! Read elements from a ListIterator and remove each from the set.
+    subtract (Qore::ListIterator x) {
+        map delete _h.($1.toString()), x;
+    }
+
+    #! Read elements from item_iterator() call and remove each from the set.
+    subtract (Math::AbstractSetItemIterator x) {
+        map delete _h.($1.toString()), x;
     }
 
     # ---------- miscellaneous ----------
