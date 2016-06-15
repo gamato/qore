@@ -391,7 +391,7 @@ public class Math::AbstractSet {
     # ---------- mathematical set operations returning new object ----------
 
     #! Return a new set containing elements common to this set and the other set.
-    any intersection (AbstractSet other) {
+    AbstractSet intersection (AbstractSet other) {
         any n = self.copy();
         n.clear();
         if (self.size() < other.size())
@@ -402,7 +402,7 @@ public class Math::AbstractSet {
     }
 
     #! Return a new set built by merging this set and the other set.
-    any union (AbstractSet other) {
+    AbstractSet union (AbstractSet other) {
         any n = self.copy();
         n.clear();
         n.merge (self);
@@ -411,7 +411,7 @@ public class Math::AbstractSet {
     }
 
     #! Return a new set containing elements from this set that are not in the other set.
-    object difference (AbstractSet other) {
+    AbstractSet difference (AbstractSet other) {
         any n = self.copy();
         n.clear();
         map n.add($1), self.item_iterator(), !other.count($1);
@@ -419,7 +419,7 @@ public class Math::AbstractSet {
     }
 
     #! Return a new set containing elements exclusive between this set and the other set.
-    object symmetric_difference (AbstractSet other) {
+    AbstractSet symmetric_difference (AbstractSet other) {
         any i = self.intersection (other);
         any n = self.copy();
         n.clear();
@@ -570,6 +570,36 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
             i = map $1, d.keyIterator(), exists _h.($1);
         self.merge (other);
         _h -= i;
+    }
+
+    # ---------- mathematical set operations returning new object ----------
+
+    #! Return a new set containing elements common to this set and the other set.
+    Math::UnsafeSet intersection (Math::UnsafeSet other) {
+        Math::UnsafeSet n (self);
+        n.intersect (other);
+        return n;
+    }
+
+    #! Return a new set built by merging this set and the other set.
+    Math::UnsafeSet union (Math::UnsafeSet other) {
+        Math::UnsafeSet n (self);
+        n.merge (other);
+        return n;
+    }
+
+    #! Return a new set containing elements from this set that are not in the other set.
+    Math::UnsafeSet difference (Math::UnsafeSet other) {
+        Math::UnsafeSet n (self);
+        n.subtract (other);
+        return n;
+    }
+
+    #! Return a new set containing elements exclusive between this set and the other set.
+    Math::UnsafeSet symmetric_difference (Math::UnsafeSet other) {
+        Math::UnsafeSet n (self);
+        n.symmetric_subtract (other);
+        return n;
     }
 
     # ---------- miscellaneous ----------
