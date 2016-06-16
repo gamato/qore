@@ -453,6 +453,14 @@ public class Math::AbstractSet {
         return True;
     }
 
+    #! Return True if this set and the other set have no element in common.
+    /**
+        Sets are disjoint if and only if their intersection is the empty set.
+    */
+    bool isdisjoint (AbstractSet other) {
+        return self.intersection(other).empty();
+    }
+
     #! Return True if every element of this set is in the other set.
     bool issubset (AbstractSet other) {
         int s = 0;

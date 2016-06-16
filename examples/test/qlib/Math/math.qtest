@@ -81,6 +81,7 @@ public class MathTest inherits QUnit::Test {
         any c = class_creator (x);
         any c1 = class_creator (x);
         any c2 = class_creator (('c', 'd', 'e'));
+        any c3 = class_creator (('d', 'e', 'f'));
         # elements + iterators
         assertEq (exp, sort(c.items()), class_name + ": items");
         assertEq (c.items(), (map $1, c.item_iterator()), class_name + ": item_iterator");
@@ -120,10 +121,12 @@ public class MathTest inherits QUnit::Test {
         assertEq (('a', 'b', 'c', 'd', 'e'), sort(c.union(c2).items()), class_name + ": union");
         assertEq (('a', 'b'), sort(c.difference(c2).items()), class_name + ": difference");
         assertEq (('a', 'b', 'd', 'e'), sort(c.symmetric_difference(c2).items()), class_name + ": symmetric_difference");
-        # equals + issubset + issuperset
+        # equals + isdisjoint + issubset + issuperset
         c = class_creator (x);
         assertTrue (c.equals (c1), class_name + ": equals");
         assertFalse (c.equals (c2), class_name + ": not equals");
+        assertTrue (c.isdisjoint (c3), class_name + ": is disjoint");
+        assertFalse (c.isdisjoint (c2), class_name + ": is not disjoint");
         assertTrue (c.issubset (c1), class_name + ": is subset");
         assertFalse (c.issubset (c2), class_name + ": is not subset");
         assertTrue (c.issuperset (c1), class_name + ": is superset");
