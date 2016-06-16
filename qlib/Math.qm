@@ -458,7 +458,12 @@ public class Math::AbstractSet {
         Sets are disjoint if and only if their intersection is the empty set.
     */
     bool isdisjoint (AbstractSet other) {
-        return self.intersection(other).empty();
+        int s = 0;
+        if (self.size() < other.size())
+            map s += 1, self.item_iterator(), other.count($1);
+        else
+            map s += 1, other.item_iterator(), self.count($1);
+        return !boolean(s);
     }
 
     #! Return True if every element of this set is in the other set.
@@ -620,6 +625,19 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
     # ========== Queries ==============================
 
     # ---------- mathematical set operations ----------
+
+    #! Return True if this set and the other set have no element in common.
+    /**
+        Sets are disjoint if and only if their intersection is the empty set.
+    */
+    bool isdisjoint (AbstractSet other) {
+        int c = 0;
+        if (self.size() <= other.size())
+            map c += 1, _h.keyIterator(), other.count($1);
+        else
+            map c += 1, other.item_iterator(), exists _h.($1.toString());
+        return !boolean(c);
+    }
 
     #! Return True if every element of this set is in the other set.
     bool issubset (AbstractSet other) {
