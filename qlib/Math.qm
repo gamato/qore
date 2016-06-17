@@ -586,6 +586,44 @@ public class Math::Set inherits Math::AbstractSet {
 
     # ---------- mathematical set operations ----------
 
+    #! Return True if this set and the other set have no element in common.
+    /**
+        Sets are disjoint if and only if their intersection is the empty set.
+    */
+    bool isdisjoint (AbstractSet other) {
+        int s = 0;
+        if (self.size() <= other.size())
+            map s += 1, _h.iterator(), other.count($1);
+        else
+            map s += 1, other.item_iterator(), self.count($1);
+        return !boolean(s);
+    }
+
+    #! Return True if this set and the other set have no element in common.
+    /**
+        Sets are disjoint if and only if their intersection is the empty set.
+    */
+    bool isdisjoint (Math::Set other) {
+        int s = 0;
+        if (self.size() <= other.size())
+            map s += 1, _h.iterator(), other.count($1);
+        else
+            map s += 1, other.dump().iterator(), self.count($1);
+        return !boolean(s);
+    }
+
+    #! Return True if every element of this set is in the other set.
+    bool issubset (AbstractSet other) {
+        int s = 0;
+        map s += 1, _h.iterator(), other.count($1);
+        return s == self.size();
+    }
+
+    #! Return True if every element of the other set is in this set.
+    bool issuperset (AbstractSet other) {
+        return other.issubset(self);
+    }
+
     #! Return the number of elements in this set (its cardinality).
     int size () {
         return _h.size();
@@ -783,6 +821,20 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
         return !boolean(c);
     }
 
+    #! Return True if this set and the other set have no element in common.
+    /**
+        Sets are disjoint if and only if their intersection is the empty set.
+    */
+    bool isdisjoint (Math::UnsafeSet other) {
+        hash d = other.dump();
+        int c = 0;
+        if (self.size() <= other.size())
+            map c += 1, _h.keyIterator(), exists d.($1);
+        else
+            map c += 1, d.keyIterator(), exists _h.($1);
+        return !boolean(c);
+    }
+
     #! Return True if every element of this set is in the other set.
     bool issubset (AbstractSet other) {
         int c = 0;
@@ -790,8 +842,21 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
         return c == _h.size();
     }
 
+    #! Return True if every element of this set is in the other set.
+    bool issubset (Math::UnsafeSet other) {
+        hash d = other.dump();
+        int c = 0;
+        map c += exists d{$1} ? 1 : 0, _h.keyIterator();
+        return c == _h.size();
+    }
+
     #! Return True if every element of the other set is in this set.
     bool issuperset (AbstractSet other) {
+        return other.issubset(self);
+    }
+
+    #! Return True if every element of the other set is in this set.
+    bool issuperset (Math::UnsafeSet other) {
         return other.issubset(self);
     }
 
