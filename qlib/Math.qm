@@ -547,6 +547,34 @@ public class Math::Set inherits Math::AbstractSet {
         }
     }
 
+    # ---------- mathematical set operations ----------
+
+    #! Remove all elements from this set that are not contained in the other set.
+    intersect (Math::Set other) {
+        map self.discard($1), _h.iterator(), !other.count($1);
+    }
+
+    #! Insert all elements found in the other set into this set.
+    merge (Math::Set other) {
+        map self.add($1), other.dump().iterator();
+    }
+
+    #! Remove all elements found in the other set from this set.
+    subtract (Math::Set other) {
+        map self.discard($1), other.dump().iterator();
+    }
+
+    #! Update the set to contain only elements exclusive between this set and the other set.
+    symmetric_subtract (Math::Set other) {
+        list i;
+        if (self.size() <= other.size())
+            i = map $1, _h.iterator(), other.count($1);
+        else
+            i = map $1, other.dump().iterator(), self.count($1);
+        self.merge (other);
+        self.subtract (i);
+    }
+
     # ---------- miscellaneous ----------
 
     #! Remove all elements from the set.
