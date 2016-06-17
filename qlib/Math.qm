@@ -575,6 +575,36 @@ public class Math::Set inherits Math::AbstractSet {
         self.subtract (i);
     }
 
+    # ---------- mathematical set operations returning new object ----------
+
+    #! Return a new set containing elements common to this set and the other set.
+    Math::Set intersection (Math::Set other) {
+        Math::Set n (self);
+        n.intersect (other);
+        return n;
+    }
+
+    #! Return a new set built by merging this set and the other set.
+    Math::Set union (Math::Set other) {
+        Math::Set n (self);
+        n.merge (other);
+        return n;
+    }
+
+    #! Return a new set containing elements from this set that are not in the other set.
+    Math::Set difference (Math::Set other) {
+        Math::Set n (self);
+        n.subtract (other);
+        return n;
+    }
+
+    #! Return a new set containing elements exclusive between this set and the other set.
+    Math::Set symmetric_difference (Math::Set other) {
+        Math::Set n (self);
+        n.symmetric_subtract (other);
+        return n;
+    }
+
     # ---------- miscellaneous ----------
 
     #! Remove all elements from the set.
