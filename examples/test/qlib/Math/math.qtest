@@ -148,6 +148,42 @@ public class MathTest inherits QUnit::Test {
         assertEq (0, c.size(), class_name + ": clear - size");
         assertEq ((), c.items(), class_name + ": clear - items");
         assertEq ((), (map $1, c.item_iterator()), class_name + ": clear - item_iterator");
+        # performance testing
+        # printf("%y\n", now_us());
+        # c = class_creator (range(int(10e4)));
+        # printf("class_creator (range()):\n%y\n", now_us());
+        # printf("%y\n", c.size());
+        # printf("c.size():\n%y\n", now_us());
+        # printf("%y\n", c.count());
+        # printf("c.count():\n%y\n", now_us());
+        # c1 = class_creator (c.item_iterator());
+        # printf("class_creator (c.item_iterator()):\n%y\n", now_us());
+        # c2 = class_creator (c);
+        # printf("class_creator (c):\n%y\n", now_us());
+        # printf("%y\n", c.intersection(c1).size());
+        # printf("c.intersection():\n%y\n", now_us());
+        # printf("%y\n", c.union(c1).size());
+        # printf("c.union():\n%y\n", now_us());
+        # printf("%y\n", c.difference(c1).size());
+        # printf("c.difference():\n%y\n", now_us());
+        # printf("%y\n", c.symmetric_difference(c1).size());
+        # printf("c.symmetric_difference():\n%y\n", now_us());
+        # c.merge(c1);
+        # printf("c.merge():\n%y\n", now_us());
+        # c.equals(c1);
+        # printf("c.equals():\n%y\n", now_us());
+        # c.intersect(c1);
+        # printf("c.intersect():\n%y\n", now_us());
+        # printf("%y\n", c.isdisjoint(c1));
+        # printf("c.isdisjoint():\n%y\n", now_us());
+        # printf("%y\n", c.issubset(c1));
+        # printf("c.issubset():\n%y\n", now_us());
+        # printf("%y\n", c.issuperset(c1));
+        # printf("c.issuperset():\n%y\n", now_us());
+        # c.subtract(c1);
+        # printf("c.subtract():\n%y\n", now_us());
+        # c1.symmetric_subtract(c2);
+        # printf("c.symmetric_subtract():\n%y\n", now_us());
     }
 
     test_multiset() {
@@ -222,6 +258,28 @@ public class MathTest inherits QUnit::Test {
         assertEq ((), c.pairs(), class_name + ": clear - pairs");
         assertEq ((), (map $1, c.item_iterator()), class_name + ": clear - item_iterator");
         assertEq ((), (map $1, c.pair_iterator()), class_name + ": clear - pair_iterator");
+        # performance testing
+        # printf("%y\n", now_us());
+        # c = class_creator (range(int(10e4)));
+        # printf("class_creator (range()):\n%y\n", now_us());
+        # printf("%y\n", c.size());
+        # printf("c.size():\n%y\n", now_us());
+        # printf("%y\n", c.count());
+        # printf("c.count():\n%y\n", now_us());
+        # c1 = class_creator (c.item_iterator());
+        # printf("class_creator (c.item_iterator()):\n%y\n", now_us());
+        # c2 = class_creator (c.pair_iterator());
+        # printf("class_creator (c.pair_iterator()):\n%y\n", now_us());
+        # c = class_creator (c);
+        # printf("class_creator (c):\n%y\n", now_us());
+        # c.merge(c1);
+        # printf("c.merge():\n%y\n", now_us());
+        # c.equals(c1);
+        # printf("c.equals():\n%y\n", now_us());
+        # printf("%y\n", c.most_common().size());
+        # printf("c.most_common():\n%y\n", now_us());
+        # c.subtract(c1);
+        # printf("c.subtract():\n%y\n", now_us());
     }
 
     test_factorial() {
