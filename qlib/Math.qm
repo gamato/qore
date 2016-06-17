@@ -301,10 +301,10 @@ public class Math::AbstractSet {
     # ---------- single element operations ----------
 
     #! Insert an element into the set. Do nothing if it is already there.
-    abstract add (any x);
+    abstract add (any item);
 
     #! Remove an element from the set. Do nothing if it is not there.
-    abstract discard (any x);
+    abstract discard (any item);
 
     # ---------- mathematical set operations ----------
 
@@ -490,12 +490,12 @@ public class Math::AbstractSet {
     # ---------- single element operations ----------
 
     #! Return True if the set contains a specified element, False if not.
-    bool contains (any x) {
-        return boolean (self.count(x));
+    bool contains (any item) {
+        return boolean (self.count(item));
     }
 
     #! Return number of occurrences of an element (which is either 1 or 0).
-    abstract int count (any x);
+    abstract int count (any item);
 
     # ========== Miscellaneous ==============================
 
@@ -659,13 +659,13 @@ public class Math::UnsafeSet inherits Math::AbstractSet {
     # ---------- single element operations ----------
 
     #! Return True if the set contains a specified element, False if not.
-    bool contains (any x) {
-        return exists _h.(x.toString());
+    bool contains (any item) {
+        return exists _h.(item.toString());
     }
 
     #! Return number of occurrences of an element (which is either 1 or 0).
-    int count (any x) {
-        return exists _h.(x.toString()) ? 1 : 0;
+    int count (any item) {
+        return exists _h.(item.toString()) ? 1 : 0;
     }
 
     # ========== Miscellaneous ==============================
