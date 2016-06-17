@@ -871,7 +871,7 @@ public class Math::Multiset inherits Math::AbstractMultiset {
         string k = item.toString();
         if (!exists _h.(k)) {
             _h.(k) = { 'count': count, 'value': item, 'type': item.typeCode() };
-            continue;
+            return;
         }
         reference r = \_h.(k);
         if (r.type != item.typeCode() || r.value != item)
@@ -885,7 +885,7 @@ public class Math::Multiset inherits Math::AbstractMultiset {
         string k = item.toString();
         if (!exists _h.(k)) {
             _h.(k) = { 'count': -count, 'value': item, 'type': item.typeCode() };
-            continue;
+            return;
         }
         reference r = \_h.(k);
         if (r.type != item.typeCode() || r.value != item)
