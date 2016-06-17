@@ -911,8 +911,14 @@ public class Math::Multiset inherits Math::AbstractMultiset {
 
     #! Return number of occurrences of an element.
     int count (any item) {
-        int c = _h.(item.toString()).count ?? 0;
-        return c > 0 ? c : 0;
+        string k = item.toString();
+        if (!exists _h.(k))
+            return 0;
+        reference r = \_h.(k);
+        if (r.value !== item)
+            throw "MULTISET-ERROR", sprintf ("cannot safely handle %s %y -- multiset already contains %s %y",
+                    item.type(), item, r.value.type(), r.value);
+        return r.count > 0 ? r.count : 0;
     }
 
     #! Return all elements repeating each as many times as its count.
