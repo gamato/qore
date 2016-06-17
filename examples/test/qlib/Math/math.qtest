@@ -72,6 +72,7 @@ public class MathTest inherits QUnit::Test {
     }
 
     test_set() {
+        _test_sets ("Set", any sub (any arg) { return new Set (arg); });
         _test_sets ("UnsafeSet", any sub (any arg) { return new UnsafeSet (arg); });
     }
 

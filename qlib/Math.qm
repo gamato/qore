@@ -509,6 +509,122 @@ class Math::AbstractSetItemIterator inherits AbstractIterator {
 
 #! Class for constructing and manipulating unordered collections of unique elements.
 /**
+    Elements are indexed as hash keys and their values are stored as hash values.
+
+    @note This class is slower than @ref Math::UnsafeSet but it is safe to be used with values other than strings.
+*/
+public class Math::Set inherits Math::AbstractSet {
+    private {
+        hash _h = {}; # consists of element values
+    }
+
+    constructor (any x) : AbstractSet (x) {
+    }
+
+    # ========== Modifiers ==============================
+
+    # ---------- single element operations ----------
+
+    #! Insert an element into the set. Do nothing if it is already there.
+    add (any item) {
+        string k = item.toString();
+        if (exists _h.(k)) {
+            if (_h.(k) !== item)
+                throw "SET-ERROR", sprintf ("cannot safely handle %s %y -- set already contains %s %y",
+                        item.type(), item, _h.(k).type(), _h.(k));
+        } else
+            _h.(k) = item;
+    }
+
+    #! Remove an element from the set. Do nothing if it is not there.
+    discard (any item) {
+        string k = item.toString();
+        if (exists _h.(k)) {
+            if (_h.(k) !== item)
+                throw "SET-ERROR", sprintf ("cannot safely handle %s %y -- set already contains %s %y",
+                        item.type(), item, _h.(k).type(), _h.(k));
+            delete _h.(k);
+        }
+    }
+
+    # ---------- miscellaneous ----------
+
+    #! Remove all elements from the set.
+    clear () {
+        _h = {};
+    }
+
+    # ========== Queries ==============================
+
+    # ---------- mathematical set operations ----------
+
+    #! Return the number of elements in this set (its cardinality).
+    int size () {
+        return _h.size();
+    }
+
+    # ---------- single element operations ----------
+
+    #! Return number of occurrences of an element (which is either 1 or 0).
+    int count (any item) {
+        string k = item.toString();
+        if (!exists _h.(k))
+            return 0;
+        if (_h.(k) !== item)
+            throw "SET-ERROR", sprintf ("cannot safely handle %s %y -- set already contains %s %y",
+                    item.type(), item, _h.(k).type(), _h.(k));
+        return 1;
+    }
+
+    # ========== Miscellaneous ==============================
+
+    #! Return internal hash structure. Note: not part of API; implementation specific (!)
+    any dump () {
+        return _h;
+    }
+
+    #! Return all elements.
+    /**
+        Elements are returned in arbitrary order.
+    */
+    list items () {
+        return map $1, _h.iterator();
+    }
+
+    #! Return an iterator over all elements.
+    /**
+        Elements are returned in arbitrary order.
+    */
+    AbstractIterator item_iterator () {
+        return new SetItemIterator (_h.iterator());
+    }
+}
+
+class Math::SetItemIterator inherits Math::AbstractSetItemIterator {
+    private {
+        HashIterator _iter;
+    }
+
+    constructor (HashIterator iter) {
+        _iter = iter;
+    }
+
+    bool valid() {
+        return _iter.valid();
+    }
+
+    bool next() {
+        return _iter.next();
+    }
+
+    any getValue() {
+        return _iter.getValue();
+    }
+}
+
+
+#! Class for constructing and manipulating unordered collections of unique elements.
+/**
     Elements are stored as hash keys and therefore they have to be hashable.
 
     @note This class is faster than @ref Math::Set but it is not safe to be used with values other than strings.
