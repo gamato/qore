@@ -823,6 +823,18 @@ public class Math::AbstractMultiset {
         return ! boolean (self.size());
     }
 
+    #!  Return True if the other multiset is equal to this multiset; otherwise return False.
+    /**
+        Two multisets are considered equal if they contain the same elements.
+    */
+    bool equals (AbstractMultiset other) {
+        if (self.size() != other.size())
+            return False;
+        if (sort (self.items()) != sort (other.items()))
+            return False;
+        return True;
+    }
+
     #! Return the number of elements in this multiset (its cardinality).
     int size () {
         int s = 0;
