@@ -175,6 +175,7 @@ set(QMOD
     qlib/HttpServerUtil.qm
     qlib/MailMessage.qm
     qlib/Mapper.qm
+    qlib/Math.qm
     qlib/Mime.qm
     qlib/MysqlSqlUtil.qm
     qlib/OracleSqlUtil.qm
