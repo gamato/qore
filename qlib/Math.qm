@@ -266,6 +266,32 @@ public namespace Math {
                 throw "VALUE-ERROR", "sum() only accepts numeric values";
         }
     }
+
+    #! Return the sample variance of data.
+    /**
+        @throw "VALUE-ERROR" if the list has less than two data points
+
+        @see @ref Math::pvariance()
+    */
+    public any sub variance (list la, *any xbar) {
+        int n = la.size();
+        if (n < 2)
+            throw "VALUE-ERROR", "variance() requires at least two data points";
+        return ssd(la, xbar) / (n-1);
+    }
+
+    #! Return the population variance of data.
+    /**
+        @throw "VALUE-ERROR" if the list has less than one data point
+
+        @see @ref Math::variance()
+    */
+    public any sub pvariance (list la, *any mu) {
+        int n = la.size();
+        if (n < 1)
+            throw "VALUE-ERROR", "pvariance() requires at least one data point";
+        return ssd(la, mu) / n;
+    }
 }
 
 # ============================== helper code ==============================
@@ -278,6 +304,19 @@ list sub Math::listmul (softlist arg, softint num) {
         --num;
     }
     return r;
+}
+
+#! Return sum of square deviations of numeric data.
+any sub Math::ssd (list la, *any c) {
+    if (!exists c)
+        c = mean (la);
+    int n = la.size();
+    any s = psum (map pow ($1 - c, 2), la);
+    any s2 = psum (map $1 - c, la); # this sum should mathematically equal zero, but due to rounding error may not
+    s -= s2 * s2 / n;
+    if (s < 0)
+        throw "VALUE-ERROR", sprintf ("negative sum of square deviations: %n", s);
+    return s;
 }
 
 
