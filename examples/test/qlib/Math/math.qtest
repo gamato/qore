@@ -47,7 +47,7 @@ public class MathTest inherits QUnit::Test {
         addTestCase ("Test median functions", \test_median());
         addTestCase ("Test mode function", \test_mode());
         addTestCase ("Test sum functions", \test_sum());
-        addTestCase ("Test variance functions", \test_variance());
+        addTestCase ("Test variance & stdev functions", \test_variance_stdev());
         set_return_value(main());
     }
 
@@ -417,43 +417,59 @@ public class MathTest inherits QUnit::Test {
         assertEq (0, psum (x), "psum: empty list");
     }
 
-    test_variance() {
+    test_variance_stdev() {
         code kod = sub () { call_function_args (argv[0], splice argv, 0, 1); };
         list x;
         # deviation of empty list is undefined
         assertThrows ("VALUE-ERROR", kod, ('variance', ()), "variance: empty list");
         assertThrows ("VALUE-ERROR", kod, ('pvariance', ()), "pvariance: empty list");
+        assertThrows ("VALUE-ERROR", kod, ('stdev', ()), "stdev: empty list");
+        assertThrows ("VALUE-ERROR", kod, ('pstdev', ()), "pstdev: empty list");
         # deviation of a single value is zero or undefined
         foreach any n in ((3, 3.14, 3.1415n)) {
             x = (n,);
             assertThrows ("VALUE-ERROR", kod, ('variance', x), "variance: single value - " + n.type());
             assertEqSoft (0, pvariance(x), "pvariance: single value - " + n.type());
+            assertThrows ("VALUE-ERROR", kod, ('stdev', x), "stdev: single value - " + n.type());
+            assertEqSoft (0, pstdev(x), "pstdev: single value - " + n.type());
         }
         # deviation of a single repeated value is zero
         foreach any n in ((3, 3.14, 3.1415n)) {
             x = listmul (n, 123);
             assertEqSoft (0, variance(x), "variance: repeated value - " + n.type());
             assertEqSoft (0, pvariance(x), "pvariance: repeated value - " + n.type());
+            assertEqSoft (0, stdev(x), "stdev: repeated value - " + n.type());
+            assertEqSoft (0, pstdev(x), "pstdev: repeated value - " + n.type());
         }
         x = listmul (0.123456789012345, 10000);
         assertEq (0.0, variance(x), "variance: repeated value - precision");
         assertEq (0.0, pvariance(x), "pvariance: repeated value - precision");
+        assertEq (0.0, stdev(x), "stdev: repeated value - precision");
+        assertEq (0.0, pstdev(x), "pstdev: repeated value - precision");
         # common case
         x = (4, 7, 13, 16);
         assertEq (30.0, variance(x), "variance: common case - integers");
         assertEq (22.5, pvariance(x), "pvariance: common case - integers");
+        assertEq (sqrt(30.0), stdev(x), "stdev: common case - integers");
+        assertEq (sqrt(22.5), pstdev(x), "pstdev: common case - integers");
         x = (2.75, 1.75, 1.25, 0.25, 0.5, 1.25, 3.5);
         assertEq (1.3720238095238095, variance(x), "variance: common case - floats");
+        assertEq (sqrt(variance(x)), stdev(x), "stdev: common case - floats");
         x = (0.0, 0.25, 0.25, 1.25, 1.5, 1.75, 2.75, 3.25);
         assertEq (1.25, pvariance(x), "pvariance: common case - floats");
+        assertEq (sqrt(pvariance(x)), pstdev(x), "pstdev: common case - floats");
         # shifting data by a constant amount does not affect its variance (or at least not much)
         x = (1, 3, 3, 4, 5, 7, 9, 10, 11, 16);
         assertEq (variance(x), variance (map $1 + 1000000000, x), "variance: shifted data - integers");
         assertEq (pvariance(x), pvariance (map $1 + 1000000000, x), "pvariance: shifted data - integers");
+        assertEq (stdev(x), stdev (map $1 + 1000000000, x), "stdev: shifted data - integers");
+        assertEq (pstdev(x), pstdev (map $1 + 1000000000, x), "pstdev: shifted data - integers");
         float eps = 0.0000000001;
         x = (1.03, 1.27, 1.94, 2.04, 2.58, 3.14, 4.75, 4.98, 5.42, 6.78);
         assertFloatEq (variance(x), variance (map $1 + 1e5, x), eps, "variance: shifted data - floats");
         assertFloatEq (pvariance(x), pvariance (map $1 + 1e5, x), eps, "pvariance: shifted data - floats");
+        assertFloatEq (stdev(x), stdev (map $1 + 1e5, x), eps, "stdev: shifted data - floats");
+        assertFloatEq (pstdev(x), pstdev (map $1 + 1e5, x), eps, "pstdev: shifted data - floats");
         # exact result for uniform data
         x = range (9999); # shuffle (range (9999))
         assertEq ((pow(10000.0, 2) - 1) / 12, pvariance(x), "pvariance: uniform data");

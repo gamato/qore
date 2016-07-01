@@ -292,6 +292,26 @@ public namespace Math {
             throw "VALUE-ERROR", "pvariance() requires at least one data point";
         return ssd(la, mu) / n;
     }
+
+    #! Return the sample standard deviation of data (the square root of the sample variance).
+    /**
+        @throw "VALUE-ERROR" if the list has less than two data points
+
+        @see @ref Math::pstdev()
+    */
+    public any sub stdev (list la, *any xbar) {
+        return sqrt (variance (la, xbar));
+    }
+
+    #! Return the population standard deviation of data (the square root of the population variance).
+    /**
+        @throw "VALUE-ERROR" if the list has less than one data point
+
+        @see @ref Math::stdev()
+    */
+    public any sub pstdev (list la, *any mu) {
+        return sqrt (pvariance (la, mu));
+    }
 }
 
 # ============================== helper code ==============================
@@ -306,7 +326,7 @@ list sub Math::listmul (softlist arg, softint num) {
     return r;
 }
 
-#! Return sum of square deviations of numeric data.
+#! Return sum of squared deviations (sum of squares) of numeric data.
 any sub Math::ssd (list la, *any c) {
     if (!exists c)
         c = mean (la);
@@ -315,7 +335,7 @@ any sub Math::ssd (list la, *any c) {
     any s2 = psum (map $1 - c, la); # this sum should mathematically equal zero, but due to rounding error may not
     s -= s2 * s2 / n;
     if (s < 0)
-        throw "VALUE-ERROR", sprintf ("negative sum of square deviations: %n", s);
+        throw "VALUE-ERROR", sprintf ("negative sum of squared deviations: %n", s);
     return s;
 }
 
