@@ -56,9 +56,9 @@ public namespace Math {
     */
     public number sub factorial (softnumber x) {
         if (x < 0)
-            throw "VALUE-ERROR", "factorial() only accepts integral values";
-        if (x != floor(x))
             throw "VALUE-ERROR", "factorial() not defined for negative values";
+        if (x != floor(x))
+            throw "VALUE-ERROR", "factorial() only accepts integral values";
         number r = 1;
         if (x >= 2)
             for (number i=2; i<=x; ++i)
@@ -145,7 +145,7 @@ public namespace Math {
     public any sub median_low (list la) {
         int n = la.size();
         if (n < 1)
-            throw "VALUE-ERROR", "median() requires at least one data point";
+            throw "VALUE-ERROR", "median_low() requires at least one data point";
         list s = sort(la);
         if (n % 2 == 1)
             return s[n/2];
@@ -164,7 +164,7 @@ public namespace Math {
     public any sub median_high (list la) {
         int n = la.size();
         if (n < 1)
-            throw "VALUE-ERROR", "median() requires at least one data point";
+            throw "VALUE-ERROR", "median_high() requires at least one data point";
         list s = sort(la);
         return s[n/2];
     }
