@@ -3,7 +3,7 @@
 
   Qore Programming Language
 
-  Copyright (C) 2003 - 2016 David Nichols
+  Copyright (C) 2003 - 2016 Qore Technologies, s.r.o.
 
   Permission is hereby granted, free of charge, to any person obtaining a
   copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,7 @@
 */
 
 #include <qore/Qore.h>
-#include <qore/intern/qore_date_private.h>
+#include "qore/intern/qore_date_private.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -61,6 +61,10 @@ DateTime::DateTime(int64 seconds, int ms) : priv(new qore_date_private) {
 
 DateTime::DateTime(const char* str) : priv(new qore_date_private) {
    setDate(str);
+}
+
+DateTime::DateTime(const char* str, ExceptionSink* xsink) : priv(new qore_date_private) {
+   setDate(str, xsink);
 }
 
 DateTime::DateTime(const AbstractQoreZoneInfo* zone, const char* str) : priv(new qore_date_private) {
@@ -259,6 +263,10 @@ void DateTime::setDate(const char* str) {
    priv->setDate(str);
 }
 
+void DateTime::setDate(const char* str, ExceptionSink* xsink) {
+   priv->setDate(str, xsink);
+}
+
 void DateTime::setDate(const AbstractQoreZoneInfo* zone, const char* str) {
    priv->setAbsoluteDate(str, zone);
 }
@@ -368,10 +376,14 @@ const AbstractQoreZoneInfo* DateTime::getZone() const {
    return priv->getZone();
 }
 
+void DateTime::setRelativeDateSeconds(int64 s, int us) {
+   priv->setRelativeDateSeconds(s, us);
+}
+
 int qore_tm::secsEast() const {
-   return zone->getUTCOffset();
+   return AbstractQoreZoneInfo::getUTCOffset(zone);
 }
 
 const char* qore_tm::regionName() const {
-   return zone->getRegionName();
+   return AbstractQoreZoneInfo::getRegionName(zone);
 }

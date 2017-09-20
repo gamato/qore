@@ -4,7 +4,7 @@
 
   Qore Programming Language
 
-  Copyright (C) 2003 - 2015 David Nichols
+  Copyright (C) 2003 - 2017 Qore Technologies, s.r.o.
 
   Permission is hereby granted, free of charge, to any person obtaining a
   copy of this software and associated documentation files (the "Software"),
@@ -47,7 +47,10 @@ extern "C" {
 #include <memory>
 #include <vector>
 
-// user module parse options
+// parse options set while parsing the module's header (init & del)
+#define MOD_HEADER_PO (PO_LOCKDOWN & ~PO_NO_MODULES)
+
+// initial user module parse options
 #define USER_MOD_PO (PO_NO_TOP_LEVEL_STATEMENTS | PO_REQUIRE_PROTOTYPES | PO_REQUIRE_OUR | PO_IN_MODULE)
 
 // module load options
@@ -249,6 +252,7 @@ public:
    }
 
    DLLLOCAL void setLink(QoreAbstractModule* n) {
+      //printd(5, "AbstractQoreModule::setLink() n: %p '%s'\n", n, n->getName());
       assert(!next);
       assert(!n->prev);
       next = n;
@@ -262,7 +266,7 @@ public:
    DLLLOCAL virtual bool isBuiltin() const = 0;
    DLLLOCAL virtual bool isUser() const = 0;
    DLLLOCAL virtual QoreHashNode* getHash(bool with_filename = true) const = 0;
-   DLLLOCAL virtual void issueParseCmd(QoreString &cmd) = 0;
+   DLLLOCAL virtual void issueParseCmd(const QoreProgramLocation& loc, QoreString &cmd) = 0;
 };
 
 // list/dequeue of strings
@@ -342,10 +346,20 @@ typedef std::set<std::string> strset_t;
 typedef std::map<std::string, strset_t> md_map_t;
 
 class ModMap {
+private:
+   DLLLOCAL ModMap(const ModMap &);
+   DLLLOCAL ModMap& operator=(const ModMap&);
+
 protected:
    md_map_t map;
 
 public:
+   DLLLOCAL ModMap() {
+   }
+
+   DLLLOCAL ~ModMap() {
+   }
+
    DLLLOCAL bool addDep(const char* l, const char* r) {
       md_map_t::iterator i = map.lower_bound(l);
       if (i == map.end() || i->first != l)
@@ -385,14 +399,15 @@ public:
    }
 
 #ifdef DEBUG
-   DLLLOCAL void show() {
+   DLLLOCAL void show(const char* name) {
+      printf("ModMap '%s':\n", name);
       for (md_map_t::iterator i = map.begin(), e = map.end(); i != e; ++i) {
          QoreString str("[");
          for (strset_t::iterator si = i->second.begin(), se = i->second.end(); si != se; ++si)
             str.sprintf("'%s',", (*si).c_str());
          str.concat("]");
 
-         printd(0, " + rmd_map '%s' -> %s\n", i->first.c_str(), str.getBuffer());
+         printd(0, " + %s '%s' -> %s\n", name, i->first.c_str(), str.getBuffer());
       }
    }
 #endif
@@ -463,9 +478,10 @@ public:
    DLLLOCAL void init(bool se);
    DLLLOCAL void delUser();
    DLLLOCAL void cleanup();
-   DLLLOCAL void issueParseCmd(const char* mname, QoreProgram* pgm, QoreString &cmd);
+   DLLLOCAL void issueParseCmd(const QoreProgramLocation& loc, const char* mname, QoreProgram* pgm, QoreString &cmd);
 
    DLLLOCAL void addModule(QoreAbstractModule* m) {
+      assert(map.find(m->getName()) == map.end());
       map.insert(module_map_t::value_type(m->getName(), m));
    }
 
@@ -592,13 +608,8 @@ public:
    DLLLOCAL virtual ~QoreBuiltinModule() {
       printd(5, "QoreBuiltinModule::~QoreBuiltinModule() '%s': %s calling module_delete: %p\n", name.getBuffer(), filename.getBuffer(), module_delete);
       module_delete();
-      if (dlptr) {
-         printd(5, "calling dlclose(%p)\n", dlptr);
-#ifndef DEBUG
-         // do not close modules when debugging
-         dlclose((void* )dlptr);
-#endif
-      }
+      // we do not close binary modules because we may have thread local data that needs to be
+      // destroyed when exit() is called
    }
 
    DLLLOCAL unsigned getAPIMajor() const {
@@ -631,7 +642,7 @@ public:
       return dlptr;
    }
 
-   DLLLOCAL virtual void issueParseCmd(QoreString &cmd);
+   DLLLOCAL virtual void issueParseCmd(const QoreProgramLocation& loc, QoreString &cmd);
 };
 
 class QoreUserModule : public QoreAbstractModule {
@@ -668,20 +679,23 @@ public:
       return getHashIntern(with_filename);
    }
 
-   DLLLOCAL virtual void issueParseCmd(QoreString &cmd) {
-      parseException("PARSE-COMMAND-ERROR", "module '%s' loaded from '%s' is a user module; only builtin modules can support parse commands", name.getBuffer(), filename.getBuffer());
+   DLLLOCAL virtual void issueParseCmd(const QoreProgramLocation& loc, QoreString &cmd) {
+      parseException(loc, "PARSE-COMMAND-ERROR", "module '%s' loaded from '%s' is a user module; only builtin modules can support parse commands", name.getBuffer(), filename.getBuffer());
    }
 };
 
 class QoreUserModuleDefContextHelper : public QoreModuleDefContextHelper {
 protected:
    const char* old_name;
+
+   qore_program_private* pgm;
+   int64 po;
+
    ExceptionSink& xsink;
    bool dup;
 
 public:
-   DLLLOCAL QoreUserModuleDefContextHelper(const char* name, ExceptionSink& xs) : old_name(set_user_module_context_name(name)), xsink(xs), dup(false) {
-   }
+   DLLLOCAL QoreUserModuleDefContextHelper(const char* name, QoreProgram* p, ExceptionSink& xs);
 
    DLLLOCAL ~QoreUserModuleDefContextHelper() {
       const char* name = set_user_module_context_name(old_name);
@@ -694,6 +708,10 @@ public:
       assert(!dup);
       dup = true;
    }
+
+   DLLLOCAL void setNameInit(const char* name);
+
+   DLLLOCAL void close();
 };
 
 #endif
