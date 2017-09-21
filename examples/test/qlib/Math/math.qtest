@@ -48,6 +48,8 @@ public class MathTest inherits QUnit::Test {
         addTestCase ("Test mode function", \test_mode());
         addTestCase ("Test sum functions", \test_sum());
         addTestCase ("Test variance & stdev functions", \test_variance_stdev());
+        addTestCase ("Test degrees function", \test_degrees());
+        addTestCase ("Test radians function", \test_radians());
         set_return_value(main());
     }
 
@@ -473,5 +475,17 @@ public class MathTest inherits QUnit::Test {
         # exact result for uniform data
         x = range (9999); # shuffle (range (9999))
         assertEq ((pow(10000.0, 2) - 1) / 12, pvariance(x), "pvariance: uniform data");
+    }
+
+    test_degrees() {
+        assertEq (180.0, degrees (M_PI), 'degrees(pi)');
+        assertEq (90.0, degrees (M_PI/2), 'degrees(pi/2)');
+        assertEq (-45.0, degrees (-M_PI/4), 'degrees(-pi/4)');
+    }
+
+    test_radians() {
+        assertEq (M_PI, radians (180), 'radians(180)');
+        assertEq (M_PI/2, radians (90), 'radians(90)');
+        assertEq (-M_PI/4, radians (-45), 'radians(-45)');
     }
 }

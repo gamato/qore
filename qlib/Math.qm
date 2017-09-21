@@ -312,6 +312,31 @@ public namespace Math {
     public any sub pstdev (list la, *any mu) {
         return sqrt (pvariance (la, mu));
     }
+
+    # -------------------- angular conversion --------------------
+
+    const DEG_TO_RAD = M_PI / 180.0;
+    const RAD_TO_DEG = 180.0 / M_PI;
+
+    #! Convert angle x from radians to degrees.
+    public float sub degrees (softfloat x) {
+        return x * RAD_TO_DEG;
+    }
+
+    #! Convert angle x from radians to degrees.
+    public number sub degrees (number x) {
+        return x * RAD_TO_DEG;
+    }
+
+    #! Convert angle x from degrees to radians.
+    public float sub radians (softfloat x) {
+        return x * DEG_TO_RAD;
+    }
+
+    #! Convert angle x from degrees to radians.
+    public number sub radians (number x) {
+        return x * DEG_TO_RAD;
+    }
 }
 
 # ============================== helper code ==============================
