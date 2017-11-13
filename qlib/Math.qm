@@ -45,10 +45,14 @@ namespace Init {
 
 public namespace Math {
     # Some useful constants
-    public const M_E = 2.718281828459045235360287471352662497757247093699959574966;
-    public const M_PI = 3.141592653589793238462643383279502884197169399375105820974;
-    public const M_SQRTPI = 1.772453850905516027298167483341145182797549456122387128213;
-    public const M_LOGPI = 1.144729885849400174143427351353058711647294812915311571513;
+    public const M_E  = 2.718281828459045235360287471352662497757247093699959574966;
+    public const M_En = 2.718281828459045235360287471352662497757247093699959574966n;
+    public const M_PI  = 3.141592653589793238462643383279502884197169399375105820974;
+    public const M_PIn = 3.141592653589793238462643383279502884197169399375105820974n;
+    public const M_SQRTPI  = 1.772453850905516027298167483341145182797549456122387128213;
+    public const M_SQRTPIn = 1.772453850905516027298167483341145182797549456122387128213n;
+    public const M_LOGPI  = 1.144729885849400174143427351353058711647294812915311571513;
+    public const M_LOGPIn = 1.144729885849400174143427351353058711647294812915311571513n;
 
     #! Return x factorial.
     /**
@@ -93,7 +97,7 @@ public namespace Math {
     }
 
     #! Return the logarithm of x to the given base, calculated as nlog(x)/nlog(base).
-    public number sub log (number n, number base = M_E) {
+    public number sub log (number n, number base = M_En) {
         return nlog(n) / nlog(base);
     }
 
@@ -317,6 +321,8 @@ public namespace Math {
 
     const DEG_TO_RAD = M_PI / 180.0;
     const RAD_TO_DEG = 180.0 / M_PI;
+    const DEG_TO_RADn = M_PIn / 180.0n;
+    const RAD_TO_DEGn = 180.0n / M_PIn;
 
     #! Convert angle x from radians to degrees.
     public float sub degrees (softfloat x) {
@@ -325,7 +331,7 @@ public namespace Math {
 
     #! Convert angle x from radians to degrees.
     public number sub degrees (number x) {
-        return x * RAD_TO_DEG;
+        return x * RAD_TO_DEGn;
     }
 
     #! Convert angle x from degrees to radians.
@@ -335,7 +341,7 @@ public namespace Math {
 
     #! Convert angle x from degrees to radians.
     public number sub radians (number x) {
-        return x * DEG_TO_RAD;
+        return x * DEG_TO_RADn;
     }
 }
 
